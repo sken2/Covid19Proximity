@@ -6,18 +6,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Toast
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import java.util.*
 
-/**
- * A simple [Fragment] subclass as the second destination in the navigation.
- */
 class HistoryFragment : Fragment() {
+
+    lateinit var manager : RecyclerView.LayoutManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_history, container, false)
     }
 
@@ -25,7 +27,13 @@ class HistoryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         view.findViewById<Button>(R.id.button_second).setOnClickListener {
-            findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
+            findNavController().navigate(R.id.action_to_setup_from_history)
+        }
+        manager = LinearLayoutManager(view.context)
+        view.findViewById<RecyclerView>(R.id.recycler_history).apply {
+            setHasFixedSize(true)
+            layoutManager = manager
+            adapter = ContactAdapter(ContactHistory.HistoryDB(view.context).readableDatabase)
         }
     }
 }

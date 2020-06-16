@@ -2,6 +2,7 @@ package com.example.covidproximity
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.Service
 import android.bluetooth.BluetoothAdapter
 import android.content.ComponentName
 import android.content.Context
@@ -17,9 +18,8 @@ import android.text.SpannableStringBuilder
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.util.Log
-import android.widget.Switch
-import android.widget.TextView
 import com.example.covidproximity.setup.BleSetup
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,15 +29,11 @@ class MainActivity : AppCompatActivity() {
     private val nm by lazy {
         getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
-    val adapterFeatures : TextView? by lazy {
-        findViewById(R.id.features) as TextView
+    val backFab by lazy {
+        findViewById(R.id.fab_back) as FloatingActionButton
     }
-    val advertiserSwitch : Switch? by lazy {
-        findViewById(R.id.switch_adv) as Switch
-    }
-    val scannerSwitch : Switch? by lazy {
-        findViewById(R.id.switch_scan) as Switch
-    }
+    var isBound = false
+
     var bleService : BleService? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,36 +42,6 @@ class MainActivity : AppCompatActivity() {
         createChannel()
 
         setContentView(R.layout.activity_main)
-
-        adapterFeatures?.text = bluetoothSpec()
-        if (BleSetup.assert(this)) {
-            val service = Intent(this, BleService::class.java).apply {
-                this.action = Const.Action.START_SENSE
-            }
-            startService(service)
-        } else {
-            BleSetup.ask(this)
-        }
-        advertiserSwitch?.isChecked = Corona.isAdvertising()
-        advertiserSwitch?.apply {
-            this.setOnCheckedChangeListener { buttonView, isChecked ->
-                if (isChecked) {
-                    Corona.startAdvertising()
-                } else {
-                    Corona.stopAdvertising()
-                }
-            }
-        }
-        scannerSwitch?.isChecked = Corona.isScanning()
-        scannerSwitch?.apply {
-            this.setOnCheckedChangeListener { buttonView, isChecked ->
-                if (isChecked) {
-                    Corona.startScanning()
-                } else {
-                    Corona.stopScanning()
-                }
-            }
-        }
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -100,6 +66,22 @@ class MainActivity : AppCompatActivity() {
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val service = Intent(this.applicationContext, BleService::class.java)
+        isBound = applicationContext.bindService(service, connection, Service.BIND_AUTO_CREATE)
+        if (!BleSetup.assert(this)) {
+            BleSetup.ask(this)
+        }
+    }
+
+    override fun onPause() {
+        if (isBound) {
+            applicationContext.unbindService(connection)
+        }
+        super.onPause()
     }
 
     override fun onDestroy() {
@@ -131,12 +113,13 @@ class MainActivity : AppCompatActivity() {
 
     val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
-            Log.v("TAG", "MainActivity::onServiceDisconnected()")
+            Log.v(Const.TAG, "MainActivity::onServiceDisconnected()")
             bleService = null
+            isBound = false
         }
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            Log.v("TAG", "MainActivity::onServiceConnected()")
+            Log.v(Const.TAG, "MainActivity::onServiceConnected()")
             val binder = service as BleService.LocalBinder
             bleService = binder.getService()
         }

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/foo"
+    app:startDestination="@id/setupFlagment">
+
+    <fragment
+        android:id="@+id/controlFragment"
+        android:name="com.example.covidproximity.ControlFragment"
+        android:label="fragment_control"
+        tools:layout="@layout/fragment_control" >
+        <action
+            android:id="@+id/action_to_setup_from_control"
+            app:destination="@id/setupFlagment" />
+    </fragment>
+    <fragment
+        android:id="@+id/historyFragment"
+        android:name="com.example.covidproximity.HistoryFragment"
+        android:label="fragment_history"
+        tools:layout="@layout/fragment_history" >
+        <action
+            android:id="@+id/action_to_setup_from_history"
+            app:destination="@id/setupFlagment" />
+    </fragment>
+    <fragment
+        android:id="@+id/setupFlagment"
+        android:name="com.example.covidproximity.SetupFlagment"
+        android:label="SetupFlagment" >
+        <action
+            android:id="@+id/action_to_history_from_setup"
+            app:destination="@id/historyFragment" />
+        <action
+            android:id="@+id/action_to_control_from_setup"
+            app:destination="@id/controlFragment" />
+    </fragment>
+</navigation>

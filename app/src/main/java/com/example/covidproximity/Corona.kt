@@ -115,16 +115,14 @@ object Corona {
     object Advertisement : AdvertiseCallback() {
 
         var proximityKey : UUID? = null
-        val bf = ByteBuffer.allocate(20).let {
-            it.order(ByteOrder.BIG_ENDIAN)
-        }
+        val bf = ByteBuffer.allocate(20).order(ByteOrder.BIG_ENDIAN)
 
         override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
             super.onStartSuccess(settingsInEffect)
         }
 
         override fun onStartFailure(errorCode: Int) {
-            Log.e(Const.TAG, "Corona::onStgartFailer $errorCode")
+            Log.e(Const.TAG, "Corona::onStartFailer $errorCode")
             advertising = false
         }
 

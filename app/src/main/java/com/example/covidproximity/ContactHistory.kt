@@ -58,6 +58,38 @@ object ContactHistory {
         return result
     }
 
+    fun getToday(db : SQLiteDatabase) : List<Contact> {
+        val now = Date()
+        val start = now.apply {
+            time = 0
+            minutes = 0
+            seconds = 0
+        }
+        val end = start.apply {
+            date += 1
+        }
+        return getWhile(db, start, end)
+    }
+
+    fun getWhile(db: SQLiteDatabase, since : Date, till : Date) : List<Contact> {
+        val result = mutableListOf<Contact>()
+        val projection = arrayOf(History.COLUMN_NAME_TIME, History.COLUMN_NAME_PROXYMITY_KEY)
+        val selection = History.COLUMN_NAME_TIME
+        val selectionArgs = arrayOf("between",  sdf.format(since), "and", sdf.format(till) )
+        val sortOrder = "${History.COLUMN_NAME_TIME} desc"
+        val cursor = db.query(History.TABLE_NAME, projection, selection, selectionArgs,null, null, sortOrder)
+        while (cursor.moveToNext()) {
+            result.add(
+                Contact(
+                    cursor.getString(cursor.getColumnIndex(History.COLUMN_NAME_TIME)),
+                    cursor.getString(cursor.getColumnIndex(History.COLUMN_NAME_PROXYMITY_KEY))
+                )
+            )
+        }
+        cursor.close()
+        return result
+    }
+
     fun record(db : SQLiteDatabase, key : UUID) {
         val contact = Contact(key)
         val values = ContentValues().apply {

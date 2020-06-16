@@ -108,7 +108,7 @@ object BleSetup : Observable(){
                         )
                     }
                 }
-                if (!lackingPrivilege.isEmpty()) {
+                if (lackingPrivilege.isNotEmpty()) {
                     activity.requestPermissions(lackingPrivilege,
                         Const.Resuest.REQUEST_PREVILEAGES
                     )
