@@ -25,10 +25,10 @@ class ContactAdapter(val db : SQLiteDatabase) : RecyclerView.Adapter<ContactAdap
     override fun onBindViewHolder(holder: HistoryHolder, position: Int) {
         val frame = holder.itemView as ViewGroup
         frame.findViewById<TextView>(R.id.view_history_time).also {
-            it.text = list.get(position).getDate()
+            it.text = list.get(position).date.toString()
         }
         frame.findViewById<TextView>(R.id.view_history_key).also {
-            it.text = list.get(position).getUuid()
+            it.text = list.get(position).uuid.toString()
         }
     }
 }

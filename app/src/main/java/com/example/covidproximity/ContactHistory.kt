@@ -47,10 +47,11 @@ object ContactHistory {
         val sortOrder = "${History.COLUMN_NAME_TIME} desc"
         val cursor = db.query(History.TABLE_NAME, projection, null, null, null, null, sortOrder)
         while (cursor.moveToNext()) {
+            val uuid = UUID.fromString(cursor.getString(cursor.getColumnIndex(History.COLUMN_NAME_PROXYMITY_KEY)))
             result.add(
                 Contact(
-                    cursor.getString(cursor.getColumnIndex(History.COLUMN_NAME_TIME)),
-                    cursor.getString(cursor.getColumnIndex(History.COLUMN_NAME_PROXYMITY_KEY))
+                    uuid,
+                    cursor.getString(cursor.getColumnIndex(History.COLUMN_NAME_TIME))
                 )
             )
         }
@@ -79,10 +80,11 @@ object ContactHistory {
         val sortOrder = "${History.COLUMN_NAME_TIME} desc"
         val cursor = db.query(History.TABLE_NAME, projection, selection, selectionArgs,null, null, sortOrder)
         while (cursor.moveToNext()) {
+            val uuid = UUID.fromString(cursor.getString(cursor.getColumnIndex(History.COLUMN_NAME_PROXYMITY_KEY)))
             result.add(
                 Contact(
-                    cursor.getString(cursor.getColumnIndex(History.COLUMN_NAME_TIME)),
-                    cursor.getString(cursor.getColumnIndex(History.COLUMN_NAME_PROXYMITY_KEY))
+                    uuid,
+                    cursor.getString(cursor.getColumnIndex(History.COLUMN_NAME_TIME))
                 )
             )
         }
@@ -93,8 +95,9 @@ object ContactHistory {
     fun record(db : SQLiteDatabase, key : UUID) {
         val contact = Contact(key)
         val values = ContentValues().apply {
-            put(History.COLUMN_NAME_TIME, contact.getDate())
-            put(History.COLUMN_NAME_PROXYMITY_KEY, contact.getUuid())
+            val isoDate = sdf.format(contact.date)
+            put(History.COLUMN_NAME_TIME, isoDate)
+            put(History.COLUMN_NAME_PROXYMITY_KEY, contact.uuid.toString())
         }
         val id = db.insert(History.TABLE_NAME, null, values)
         Log.v("TAG", "ContactHisory::record inserted $id")
@@ -103,23 +106,17 @@ object ContactHistory {
     class Contact() {
         lateinit var uuid : UUID
         lateinit var date : Date
-        constructor(who : UUID, now : Date) : this() {
-            uuid = who
+        constructor(key : UUID, now : Date) : this() {
+            uuid = key
             date = now
         }
-        constructor(who : UUID) : this(who, Date()) {
+        constructor(key : UUID) : this(key, Date()) {
         }
-        constructor(dateString : String, uuidStgring : String) : this() {
-            uuid = UUID.fromString(uuidStgring)
-            sdf.parse(dateString)?.apply{
+        constructor(key : UUID, isoDate : String) : this() {
+            uuid = key
+            sdf.parse(isoDate).run {
                 this@Contact.date = this
             }
-        }
-        fun getDate() : String {
-            return sdf.format(this.date)
-        }
-        fun getUuid() : String {
-            return this.uuid.toString()
         }
     }
 
