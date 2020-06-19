@@ -68,7 +68,7 @@ object Corona {
                     result?.scanRecord?.run {
                         val proximityKey = getKey(bytes)
                         Log.i(Const.TAG, "Corona::onScanResult proximity key found $proximityKey")
-                        Emitter.run {
+                        KeyEmitter.run {
                             arrive(proximityKey)
                         }
                     }
@@ -146,7 +146,7 @@ object Corona {
         }
     }
 
-    object Emitter : Observable() {
+    object KeyEmitter : Observable() {
         fun arrive(key : UUID) {
             setChanged()
             notifyObservers(key)
