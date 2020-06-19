@@ -8,6 +8,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
 import android.graphics.Typeface
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -18,8 +19,10 @@ import android.text.SpannableStringBuilder
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.example.covidproximity.setup.BleSetup
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,11 +40,13 @@ class MainActivity : AppCompatActivity() {
     var bleService : BleService? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.v(Const.TAG, "MainActivity::onCreate")
         super.onCreate(savedInstanceState)
 
-        createChannel()
-
         setContentView(R.layout.activity_main)
+        createChannel()
+        val sevice = Intent(this, BleService::class.java)
+        startService(sevice)
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -50,34 +55,34 @@ class MainActivity : AppCompatActivity() {
                 Log.i(Const.TAG, "MainActivity::onNewIntent no action on intent")
             }
         }
+        when (BleSetup.getState()) {
+            BleSetup.Status.NEED_PRIVILAGE -> {
+                var previleageNeeded = emptyArray<String>()
+                for (previleage in BleSetup.preferPlivileges) {
+                    if (ContextCompat.checkSelfPermission(this, previleage) != PackageManager.PERMISSION_GRANTED) {
+                        previleageNeeded += previleage
+                    }
+                }
+                if (previleageNeeded.isNotEmpty()) {
+                    requestPermissions(previleageNeeded, Const.Resuest.REQUEST_PREVILEAGES)
+                }
+            }
+            else -> {}  // other request is issued by BleService
+        }
         super.onNewIntent(intent)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            Const.Resuest.REQUEST_PREVILEAGES, Const.Resuest.REQUEST_ENABLE_LOCATION -> {
-                Log.v(Const.TAG, "MainActivity::onActivityResult resultCode = $resultCode")
-                if (BleSetup.assert(this)) {
-                    val service = Intent(this, BleService::class.java).apply {
-                        this.action = Const.Action.START_SENSE
-                    }
-                    startService(service)
-                }
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data)
-    }
-
     override fun onResume() {
+        Log.v(Const.TAG, "MainActivity::onResume")
         super.onResume()
+        BleSetup.onPrevileageChanged(this)
+        BleSetup.onLocationChanged(this)
         val service = Intent(this.applicationContext, BleService::class.java)
         isBound = applicationContext.bindService(service, connection, Service.BIND_AUTO_CREATE)
-        if (!BleSetup.assert(this)) {
-            BleSetup.ask(this)
-        }
     }
 
     override fun onPause() {
+        Log.v(Const.TAG, "Mainactivity::onPause")
         if (isBound) {
             applicationContext.unbindService(connection)
         }
@@ -85,7 +90,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        Log.v(Const.TAG, "MainAcctivity::onDestroy")
         super.onDestroy()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            Const.Resuest.REQUEST_PREVILEAGES, Const.Resuest.REQUEST_ENABLE_LOCATION -> {
+                Log.v(Const.TAG, "MainActivity::onActivityResult resultCode = $resultCode")
+                BleSetup.onLocationChanged(this)
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        Log.v(Const.TAG, "MainActivity::onRequestPermissionsResult")
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     fun bluetoothSpec() : SpannableStringBuilder {

@@ -10,11 +10,11 @@
         android:id="@+id/button_show_contact"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="36dp"
+        android:layout_marginBottom="32dp"
         android:text="@string/button_label_history"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.114"
+        app:layout_constraintHorizontal_bias="0.154"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Switch
@@ -35,4 +35,13 @@
         android:text="@string/switch_label_scan"
         app:layout_constraintStart_toStartOf="@+id/switch_advertise"
         app:layout_constraintTop_toBottomOf="@+id/switch_advertise" />
+
+    <Button
+        android:id="@+id/button_stop_service"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="44dp"
+        android:text="Stop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/button_show_contact" />
 </androidx.constraintlayout.widget.ConstraintLayout>

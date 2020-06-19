@@ -29,7 +29,9 @@ class HistoryFragment : Fragment() {
         view.findViewById<Button>(R.id.button_second).setOnClickListener {
             findNavController().navigate(R.id.action_to_setup_from_history)
         }
-        manager = LinearLayoutManager(view.context)
+        manager = LinearLayoutManager(view.context).apply {
+            canScrollVertically()
+        }
         view.findViewById<RecyclerView>(R.id.recycler_history).apply {
             setHasFixedSize(true)
             layoutManager = manager
