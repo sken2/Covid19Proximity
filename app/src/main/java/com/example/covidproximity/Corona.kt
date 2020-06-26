@@ -8,7 +8,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
 
-object Corona {
+object Corona : Observable() {
 
     val adapter by lazy {
         BluetoothAdapter.getDefaultAdapter()
@@ -37,23 +37,35 @@ object Corona {
     fun isScanning() = scanning
 
     fun startAdvertising() {
-        adapter?.bluetoothLeAdvertiser?.startAdvertising(Advertisement.getSettings(), Advertisement.getData(), Advertisement)
-        advertising = true
+        if (!advertising) {
+            adapter?.bluetoothLeAdvertiser?.startAdvertising(Advertisement.getSettings(), Advertisement.getData(), Advertisement)
+            advertising = true
+            setChanged()
+            notifyObservers()
+        }
     }
 
     fun stopAdvertising() {
         adapter?.bluetoothLeAdvertiser?.stopAdvertising(Advertisement)
         advertising = false
+        setChanged()
+        notifyObservers()
     }
 
     fun startScanning() {
-        adapter?.bluetoothLeScanner?.startScan(Scanning.getFilters(), Scanning.getSettings(), Scanning)
-        scanning = true
+        if (!scanning) {
+            adapter?.bluetoothLeScanner?.startScan(Scanning.getFilters(), Scanning.getSettings(), Scanning)
+            scanning = true
+            setChanged()
+            notifyObservers()
+        }
     }
 
     fun stopScanning() {
         adapter?.bluetoothLeScanner?.stopScan(Scanning)
         scanning = false
+        setChanged()
+        notifyObservers()
     }
 
     object Scanning : ScanCallback() {
@@ -80,6 +92,8 @@ object Corona {
         override fun onScanFailed(errorCode: Int) {
             Log.e(Const.TAG, "onScanFailed $errorCode")
             scanning = false
+            setChanged()
+            notifyObservers()
         }
 
         fun getFilters(): List<ScanFilter> {
@@ -101,8 +115,9 @@ object Corona {
             while (point < data.size) {
                 when (data[point + 1]) {    // fetch type
                     0x16.toByte() -> {
+                        bf.rewind()
                         val keyPosition = point + 4
-                        bf.put(data.copyOfRange(keyPosition, keyPosition+15))
+                        bf.put(data.copyOfRange(keyPosition, keyPosition+16))
                         return UUID(bf.getLong(0), bf.getLong(8))
                     }
                     else -> point += (data[point] + 1)
@@ -124,6 +139,8 @@ object Corona {
         override fun onStartFailure(errorCode: Int) {
             Log.e(Const.TAG, "Corona::onStartFailer $errorCode")
             advertising = false
+            setChanged()
+            notifyObservers()
         }
 
         fun getSettings() : AdvertiseSettings {
