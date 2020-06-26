@@ -47,11 +47,19 @@ object BleSetup : Observable() {
         UNKNOWN("not initialized yet")
     }
 
-    private fun isAdapterEnabled() : Boolean {
+    fun isAdapterEnabled() : Boolean {
         adapter?.run {
             return isEnabled
         }
         return false
+    }
+
+    fun isPrivilageFullfill() :Boolean {
+        return prefileageFullfill
+    }
+
+    fun isLocationEnable() : Boolean {
+        return locationElable
     }
 
     override fun setChanged() {

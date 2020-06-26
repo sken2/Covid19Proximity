@@ -6,32 +6,125 @@
     android:layout_height="match_parent"
     tools:context=".HistoryFragment">
 
-    <Button
-        android:id="@+id/button_to_control"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/text_bluetooth_status"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="56dp"
-        android:layout_marginTop="132dp"
-        android:text="Control"
+        android:text="bluetooth_status"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/button_to_contact"
+    <TextView
+        android:id="@+id/text_privilage_status"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Privileage Status"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/switch_recall_bluetooth" />
+
+    <TextView
+        android:id="@+id/text_location_status"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Location Status"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/switch_recall_privilage" />
+
+    <Switch
+        android:id="@+id/switch_recall_bluetooth"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:text="Contact"
-        app:layout_constraintBottom_toBottomOf="@+id/button_to_control"
-        app:layout_constraintStart_toEndOf="@+id/button_to_control" />
+        android:layout_marginTop="32dp"
+        android:text="Recall when App was Stopped"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_bluetooth_description" />
+
+    <Switch
+        android:id="@+id/switch_recall_privilage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Recall when App was Stopped"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_privilage_description" />
+
+    <Switch
+        android:id="@+id/switch_recall_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Recall when App was Stopped"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_location_description" />
 
     <Button
-        android:id="@+id/button_to_aboutthis"
+        android:id="@+id/button_bluetooth_change"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:text="help"
-        app:layout_constraintBottom_toBottomOf="@+id/button_to_control"
-        app:layout_constraintStart_toEndOf="@+id/button_to_contact" />
+        android:layout_marginEnd="8dp"
+        android:text="Change"
+        app:layout_constraintBottom_toBottomOf="@+id/text_bluetooth_description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/text_bluetooth_description" />
+
+    <Button
+        android:id="@+id/button_privileage_change"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="change"
+        app:layout_constraintBottom_toBottomOf="@+id/text_privilage_description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/text_privilage_description" />
+
+    <Button
+        android:id="@+id/button_location_change"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="change"
+        app:layout_constraintBottom_toBottomOf="@+id/text_location_description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/text_location_description" />
+
+    <TextView
+        android:id="@+id/text_bluetooth_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="TextView"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_bluetooth_status" />
+
+    <TextView
+        android:id="@+id/text_privilage_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="TextView"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_privilage_status" />
+
+    <TextView
+        android:id="@+id/text_location_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="TextView"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_location_status" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
 

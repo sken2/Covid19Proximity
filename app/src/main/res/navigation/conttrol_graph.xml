@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/foo"
-    app:startDestination="@id/setupFlagment">
+    app:startDestination="@id/controlFragment">
 
     <fragment
         android:id="@+id/controlFragment"
@@ -11,7 +11,10 @@
         android:label="fragment_control"
         tools:layout="@layout/fragment_control" >
         <action
-            android:id="@+id/action_to_setup_from_control"
+            android:id="@+id/action_controlFragment_to_historyFragment"
+            app:destination="@id/historyFragment" />
+        <action
+            android:id="@+id/action_controlFragment_to_setupFlagment"
             app:destination="@id/setupFlagment" />
     </fragment>
     <fragment
@@ -20,18 +23,11 @@
         android:label="fragment_history"
         tools:layout="@layout/fragment_history" >
         <action
-            android:id="@+id/action_to_setup_from_history"
-            app:destination="@id/setupFlagment" />
+            android:id="@+id/action_historyFragment_to_controlFragment"
+            app:destination="@id/controlFragment" />
     </fragment>
     <fragment
         android:id="@+id/setupFlagment"
         android:name="com.example.covidproximity.SetupFlagment"
-        android:label="SetupFlagment" >
-        <action
-            android:id="@+id/action_to_history_from_setup"
-            app:destination="@id/historyFragment" />
-        <action
-            android:id="@+id/action_to_control_from_setup"
-            app:destination="@id/controlFragment" />
-    </fragment>
+        android:label="SetupFlagment" />
 </navigation>

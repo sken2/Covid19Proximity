@@ -1,16 +1,38 @@
 package com.example.covidproximity
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Switch
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
-import java.util.*
+import com.example.covidproximity.setup.BleSetup
 
 class SetupFlagment : Fragment() {
+
+    val btButton by lazy {
+        view?.findViewById<Button>(R.id.button_bluetooth_change)
+    }
+    val btDescription by lazy {
+        view?.findViewById<TextView>(R.id.text_bluetooth_description)
+    }
+    val privilageButton by lazy {
+        view?.findViewById<Button>(R.id.button_privileage_change)
+    }
+    val privilageDescription by lazy {
+        view?.findViewById<TextView>(R.id.text_privilage_description)
+    }
+    val locationButton by lazy {
+        view?.findViewById<Button>(R.id.button_location_change)
+    }
+    val locationDescription by lazy {
+        view?.findViewById<TextView>(R.id.text_location_description)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -20,25 +42,59 @@ class SetupFlagment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        view.findViewById<Button>(R.id.button_to_control)?.apply {
-            this.setOnClickListener {
-                findNavController().navigate(R.id.action_to_control_from_setup)
+        Log.v(Const.TAG, "SetupFragment::onViewCreated")
+        with(view) {
+            findViewById<Switch>(R.id.switch_recall_bluetooth).apply {
+                setOnCheckedChangeListener { buttonView, isChecked ->
+                    //set preference
+                }
             }
-        }
-        view.findViewById<Button>(R.id.button_to_contact)?.apply {
-            this.setOnClickListener {
-                findNavController().navigate(R.id.action_to_history_from_setup)
-            }
-        }
+            findViewById<Switch>(R.id.switch_recall_privilage).apply {
+                setOnCheckedChangeListener{ buttonView, isChecked ->
 
-        view.findViewById<Button>(R.id.button_to_aboutthis)?.apply {
-            setOnClickListener{
-                val wdb = ContactHistory.HistoryDB(view.context).writableDatabase
-                ContactHistory.record(wdb, UUID.randomUUID())
-                Toast.makeText(view.context, "data inserted", Toast.LENGTH_SHORT).show()
-                wdb.close()
+                }
             }
+            findViewById<Switch>(R.id.switch_recall_location).apply {
+                setOnCheckedChangeListener{ buttonView, isChecked ->
+
+                }
+            }
+        }
+        btButton?.setOnClickListener {
+            Toast.makeText(context, "Bluetooth turn to on", Toast.LENGTH_SHORT).show()  //TODO
+        }
+        privilageButton?.setOnClickListener {
+            Toast.makeText(context, "Privilege turn to on", Toast.LENGTH_SHORT).show()  //TODO
+        }
+        locationButton?.setOnClickListener {
+            Toast.makeText(context, "Bluetooth turn to on", Toast.LENGTH_SHORT).show()  //TODO
         }
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        with(view) {
+            BleSetup.isAdapterEnabled().let {
+                btButton?.isEnabled = !it
+                btDescription?.text = "Bluetooth is ${offon(it)}"
+            }
+            BleSetup.isPrivilageFullfill().let {
+                privilageButton?.isEnabled = !it
+                privilageDescription?.text = "Access permission is ${offon(it)}"
+            }
+            BleSetup.isLocationEnable().let {
+                locationButton?.isEnabled = !it
+                locationDescription?.text = "Location provider is ${offon(it)}"
+            }
+        }
+    }
+
+    private fun offon(state : Boolean) : String {
+        return if (state) {
+            "On"
+        } else {
+            "Off"
+        }
     }
 }

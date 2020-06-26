@@ -27,7 +27,7 @@ class HistoryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         view.findViewById<Button>(R.id.button_second).setOnClickListener {
-            findNavController().navigate(R.id.action_to_setup_from_history)
+            findNavController().navigate(R.id.action_historyFragment_to_controlFragment)
         }
         manager = LinearLayoutManager(view.context).apply {
             canScrollVertically()

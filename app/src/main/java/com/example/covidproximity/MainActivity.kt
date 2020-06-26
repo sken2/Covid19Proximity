@@ -1,6 +1,5 @@
 package com.example.covidproximity
 
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.bluetooth.BluetoothAdapter
@@ -10,7 +9,6 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.graphics.Typeface
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
@@ -21,8 +19,8 @@ import android.text.style.StyleSpan
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.example.covidproximity.setup.BleSetup
+import com.example.covidproximity.setup.NotificationSetup
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -44,7 +42,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
-        createChannel()
+        NotificationSetup.createChannel(this)
         val sevice = Intent(this, BleService::class.java)
         startService(sevice)
     }
@@ -147,17 +145,6 @@ class MainActivity : AppCompatActivity() {
             Log.v(Const.TAG, "MainActivity::onServiceConnected()")
             val binder = service as BleService.LocalBinder
             bleService = binder.getService()
-        }
-    }
-
-    private fun createChannel() {
-        if (Build.VERSION.SDK_INT >= 26) {
-            val name = "status"
-            val description = "information about current situation"
-            val channelId = getString(R.string.not_channel_id)
-            val channel = NotificationChannel(channelId, name, NotificationManager.IMPORTANCE_LOW)
-            channel.description = description
-            nm.createNotificationChannel(channel)
         }
     }
 }
