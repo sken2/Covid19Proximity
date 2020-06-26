@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Switch
 import androidx.navigation.fragment.findNavController
+import com.example.covidproximity.key.Covid19
 import java.util.*
 
 class ControlFragment : Fragment(), Observer {
@@ -33,22 +34,22 @@ class ControlFragment : Fragment(), Observer {
         super.onViewCreated(view, savedInstanceState)
         with(view) {
             advertiseSwitch?.apply {
-                this.isChecked = Corona.isAdvertising()
+                this.isChecked = Covid19.isAdvertising()
                 this.setOnCheckedChangeListener { buttonView, isChecked ->
                     if (isChecked) {
-                        Corona.startAdvertising()
+                        Covid19.startAdvertising()
                     } else {
-                        Corona.stopAdvertising()
+                        Covid19.stopAdvertising()
                     }
                 }
             }
             scanSwitch?.apply {
-                this.isChecked = Corona.isScanning()
+                this.isChecked = Covid19.isScanning()
                 this.setOnCheckedChangeListener { buttonView, isChecked ->
                     if (isChecked) {
-                        Corona.startScanning()
+                        Covid19.startScanning()
                     } else {
-                        Corona.stopScanning()
+                        Covid19.stopScanning()
                     }
                 }
             }
@@ -69,13 +70,13 @@ class ControlFragment : Fragment(), Observer {
 
     override fun onResume() {
         super.onResume()
-        Corona.addObserver(this)
-        advertiseSwitch?.isChecked = Corona.isAdvertising()
-        scanSwitch?.isChecked = Corona.isScanning()
+        Covid19.addObserver(this)
+        advertiseSwitch?.isChecked = Covid19.isAdvertising()
+        scanSwitch?.isChecked = Covid19.isScanning()
     }
 
     override fun onPause() {
-        Corona.deleteObserver(this)
+        Covid19.deleteObserver(this)
         super.onPause()
     }
 
@@ -85,7 +86,7 @@ class ControlFragment : Fragment(), Observer {
     }
 
     override fun update(o: Observable?, arg: Any?) {
-        if (o is Corona) {
+        if (o is Covid19) {
             advertiseSwitch?.isChecked = o.isAdvertising()
             scanSwitch?.isChecked = o.isScanning()
         }

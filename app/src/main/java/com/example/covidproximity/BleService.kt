@@ -7,13 +7,12 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.database.sqlite.SQLiteDatabase
-import android.location.LocationManager
-import android.location.LocationProvider
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
+import com.example.covidproximity.key.Covid19
 import com.example.covidproximity.setup.BleSetup
 import java.util.*
 
@@ -40,7 +39,7 @@ class BleService : Service(), Observer {
         history = db.writableDatabase
         val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
         registerReceiver(BleSetup.btReceiver, filter)
-        Corona.KeyEmitter.addObserver(this)
+        Covid19.KeyEmitter.addObserver(this)
         BleSetup.addObserver(this)
     }
 
@@ -50,10 +49,10 @@ class BleService : Service(), Observer {
             when (BleSetup.getState()) {
                 BleSetup.Status.OK -> {
                     if (preferences.getBoolean(Const.Preferences.AUTO_ADVERTISE, false)) {
-                        Corona.startAdvertising()
+                        Covid19.startAdvertising()
                     }
                     if (preferences.getBoolean(Const.Preferences.AUTO_SCAN, false)) {
-                        Corona.startScanning()
+                        Covid19.startScanning()
                     }
                 }
                 BleSetup.Status.NO_ADAPTER, BleSetup.Status.NO_BLE_FUTURE -> {
@@ -69,7 +68,7 @@ class BleService : Service(), Observer {
     override fun onDestroy() {
         Log.v(Const.TAG, "BleService::onDestroy")
         BleSetup.deleteObserver(this)
-        Corona.KeyEmitter.deleteObserver(this)
+        Covid19.KeyEmitter.deleteObserver(this)
         history.close()
         db.close()
         unregisterReceiver(BleSetup.btReceiver)
@@ -88,7 +87,7 @@ class BleService : Service(), Observer {
 
     override fun update(o: Observable?, arg: Any?) {
         when {
-            o is Corona.KeyEmitter -> {
+            o is Covid19.KeyEmitter -> {
                 val key = arg as UUID
                 ContactHistory.record(history, key)
             }
@@ -110,7 +109,7 @@ class BleService : Service(), Observer {
     }
 
     private fun newNotification() : Notification {
-        val title = if (Corona.isRunning()) {
+        val title = if (Covid19.isRunning()) {
             "Running"
         } else {
             "Standing by"

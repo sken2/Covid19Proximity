@@ -1,14 +1,15 @@
-package com.example.covidproximity
+package com.example.covidproximity.key
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.*
 import android.os.ParcelUuid
 import android.util.Log
+import com.example.covidproximity.Const
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
 
-object Corona : Observable() {
+object Covid19 : Observable() {
 
     val adapter by lazy {
         BluetoothAdapter.getDefaultAdapter()
@@ -38,7 +39,11 @@ object Corona : Observable() {
 
     fun startAdvertising() {
         if (!advertising) {
-            adapter?.bluetoothLeAdvertiser?.startAdvertising(Advertisement.getSettings(), Advertisement.getData(), Advertisement)
+            adapter?.bluetoothLeAdvertiser?.startAdvertising(
+                Advertisement.getSettings(),
+                Advertisement.getData(),
+                Advertisement
+            )
             advertising = true
             setChanged()
             notifyObservers()
@@ -46,7 +51,9 @@ object Corona : Observable() {
     }
 
     fun stopAdvertising() {
-        adapter?.bluetoothLeAdvertiser?.stopAdvertising(Advertisement)
+        adapter?.bluetoothLeAdvertiser?.stopAdvertising(
+            Advertisement
+        )
         advertising = false
         setChanged()
         notifyObservers()
@@ -54,7 +61,11 @@ object Corona : Observable() {
 
     fun startScanning() {
         if (!scanning) {
-            adapter?.bluetoothLeScanner?.startScan(Scanning.getFilters(), Scanning.getSettings(), Scanning)
+            adapter?.bluetoothLeScanner?.startScan(
+                Scanning.getFilters(),
+                Scanning.getSettings(),
+                Scanning
+            )
             scanning = true
             setChanged()
             notifyObservers()
@@ -62,7 +73,9 @@ object Corona : Observable() {
     }
 
     fun stopScanning() {
-        adapter?.bluetoothLeScanner?.stopScan(Scanning)
+        adapter?.bluetoothLeScanner?.stopScan(
+            Scanning
+        )
         scanning = false
         setChanged()
         notifyObservers()
@@ -78,10 +91,15 @@ object Corona : Observable() {
                 ScanSettings.CALLBACK_TYPE_ALL_MATCHES -> {
                     Log.v(Const.TAG, "Corona::onScanResult callbackType = CALLBACK_TYPE_ALL_MATCHES")
                     result?.scanRecord?.run {
-                        val proximityKey = getKey(bytes)
+                        val proximityKey =
+                            getKey(
+                                bytes
+                            )
                         Log.i(Const.TAG, "Corona::onScanResult proximity key found $proximityKey")
                         KeyEmitter.run {
-                            arrive(proximityKey)
+                            arrive(
+                                proximityKey
+                            )
                         }
                     }
                     contactCount += 1
