@@ -6,7 +6,7 @@ import android.os.Build
 import android.os.ParcelUuid
 import android.util.Log
 import com.example.covidproximity.Const
-import com.example.covidproximity.ContactHistory
+import com.example.covidproximity.model.ContactHistory
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*

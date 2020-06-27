@@ -8,20 +8,17 @@ import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.database.sqlite.SQLiteDatabase
 import android.os.Binder
-import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import com.example.covidproximity.key.Covid19
+import com.example.covidproximity.model.ContactHistory
 import com.example.covidproximity.setup.BleSetup
+import com.example.covidproximity.setup.NotificationSetup
 import java.util.*
 
 class BleService : Service(), Observer {
 
-    val CHANNEL_ID by lazy {
-        getString(R.string.not_channel_id)
-    }
-    private val REQUEST_CODE = 4649
     lateinit var db : ContactHistory.HistoryDB
     lateinit var history : SQLiteDatabase
     private val preferences : SharedPreferences by lazy {
@@ -96,7 +93,7 @@ class BleService : Service(), Observer {
             }
             o is BleSetup -> {
                 val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                nm.notify(Const.Resuest.NOTIFY_FOREGROUND, newNotification())
+                nm.notify(Const.Resuest.NOTIFY_FOREGROUND, NotificationSetup.newNotification(this))
             }
             else -> {
                 Log.e(Const.TAG, "BleService::update unknown update from $o")
@@ -111,59 +108,9 @@ class BleService : Service(), Observer {
         }
     }
 
-    private fun newNotification() : Notification {
-        val title = if (Covid19.isRunning()) {
-            "Running"
-        } else {
-            "Standing by"
-        }
-        val intent = requestIntent()
-        val builder = if (Build.VERSION.SDK_INT >= 26) {
-            Notification.Builder(this, CHANNEL_ID)
-        } else {
-            Notification.Builder(this)
-        }
-        builder.setSmallIcon(R.drawable.ic_proximity)
-            .setTicker(title)
-            .setSubText(BleSetup.getState().toString())
-            .setContentIntent(intent)
-        return builder.build()
-    }
-
-    private fun requestIntent() : PendingIntent {
-        when (BleSetup.getState()) {
-            BleSetup.Status.OK -> {
-                return PendingIntent.getActivity(
-                    this.applicationContext, REQUEST_CODE, Intent(this.applicationContext, MainActivity::class.java), PendingIntent.FLAG_CANCEL_CURRENT
-                )
-            }
-            BleSetup.Status.ADAPTER_IS_OFF -> {
-                return PendingIntent.getActivity(
-                    this.applicationContext, REQUEST_CODE, Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), PendingIntent.FLAG_CANCEL_CURRENT
-                )
-            }
-            BleSetup.Status.LOCATION_IS_OFF -> {
-                return PendingIntent.getActivity(
-                    this.applicationContext, REQUEST_CODE, Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), PendingIntent.FLAG_CANCEL_CURRENT
-                )
-            }
-            BleSetup.Status.NEED_PRIVILAGE -> {
-                return PendingIntent.getActivity(
-                    this.applicationContext, REQUEST_CODE, Intent(this.applicationContext, MainActivity::class.java), PendingIntent.FLAG_CANCEL_CURRENT
-                )
-            }
-            else -> {
-                Log.e(Const.TAG, "BleService::requestIntent state unimplemented")
-                return PendingIntent.getService(
-                    this.applicationContext, REQUEST_CODE, Intent(this.applicationContext, BleService::class.java), PendingIntent.FLAG_CANCEL_CURRENT
-                )
-            }
-        }
-    }
-
     private fun goForeground() {
         Log.v(Const.TAG, "BleService::goForeground")
-        startForeground(Const.Resuest.NOTIFY_FOREGROUND, newNotification())
+        startForeground(Const.Resuest.NOTIFY_FOREGROUND, NotificationSetup.newNotification(this))
     }
 
     inner class LocalBinder() : Binder() {

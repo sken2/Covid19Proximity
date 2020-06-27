@@ -1,4 +1,4 @@
-package com.example.covidproximity
+package com.example.covidproximity.model
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
@@ -33,7 +33,10 @@ object ContactHistory {
     private val DATABASE_NAME = "history.db"
     private val DATABASE_VERSION = 1
 
-    class HistoryDB(context : Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+    class HistoryDB(context : Context) : SQLiteOpenHelper(context,
+        DATABASE_NAME, null,
+        DATABASE_VERSION
+    ) {
 
         override fun onCreate(db: SQLiteDatabase?) {
             db?.execSQL(SQL_CREATE_ENTRIES)
@@ -47,7 +50,10 @@ object ContactHistory {
 
     fun getAll(db : SQLiteDatabase) : List<Contact>{
         val result = mutableListOf<Contact>()
-        val projection = arrayOf(History.COLUMN_NAME_TIME, History.COLUMN_NAME_PROXYMITY_KEY)
+        val projection = arrayOf(
+            History.COLUMN_NAME_TIME,
+            History.COLUMN_NAME_PROXYMITY_KEY
+        )
         val sortOrder = "${History.COLUMN_NAME_TIME} desc"
         val cursor = db.query(History.TABLE_NAME, projection, null, null, null, null, sortOrder)
         while (cursor.moveToNext()) {
@@ -75,13 +81,21 @@ object ContactHistory {
         val end = start.apply {
             date += 1
         }
-        return getWhile(db, start, end)
+        return getWhile(
+            db,
+            start,
+            end
+        )
     }
 
     fun getWhile(db: SQLiteDatabase, since : Date, till : Date) : List<Contact> {
         val result = mutableListOf<Contact>()
-        val projection = arrayOf(History.COLUMN_NAME_TIME, History.COLUMN_NAME_PROXYMITY_KEY)
-        val selection = History.COLUMN_NAME_TIME
+        val projection = arrayOf(
+            History.COLUMN_NAME_TIME,
+            History.COLUMN_NAME_PROXYMITY_KEY
+        )
+        val selection =
+            History.COLUMN_NAME_TIME
         val selectionArgs = arrayOf("between",  sdf.format(since), "and", sdf.format(till) )
         val sortOrder = "${History.COLUMN_NAME_TIME} desc"
         val cursor = db.query(History.TABLE_NAME, projection, selection, selectionArgs,null, null, sortOrder)
@@ -113,7 +127,11 @@ object ContactHistory {
         Log.v("TAG", "ContactHisory::record inserted $id")
     }
     fun record(db : SQLiteDatabase, key : UUID, txRssi : Int, rxRssi : Int) {
-        val contact = Contact(key, txRssi, rxRssi)
+        val contact = Contact(
+            key,
+            txRssi,
+            rxRssi
+        )
         val values = ContentValues().apply {
             val isoDate = sdf.format(contact.date)
             put(History.COLUMN_NAME_TIME, isoDate)
