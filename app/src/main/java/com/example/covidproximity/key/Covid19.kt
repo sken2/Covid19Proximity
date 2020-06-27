@@ -2,9 +2,11 @@ package com.example.covidproximity.key
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.*
+import android.os.Build
 import android.os.ParcelUuid
 import android.util.Log
 import com.example.covidproximity.Const
+import com.example.covidproximity.ContactHistory
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
@@ -82,23 +84,27 @@ object Covid19 : Observable() {
     }
 
     object Scanning : ScanCallback() {
-        val bf = ByteBuffer.allocate(16).apply {
+        private val bf: ByteBuffer = ByteBuffer.allocate(16).apply {
             this.order(ByteOrder.BIG_ENDIAN)
         }
 
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
             when (callbackType) {
                 ScanSettings.CALLBACK_TYPE_ALL_MATCHES -> {
-                    Log.v(Const.TAG, "Corona::onScanResult callbackType = CALLBACK_TYPE_ALL_MATCHES")
+                    Log.v(Const.TAG, "Covid19::onScanResult callbackType = CALLBACK_TYPE_ALL_MATCHES")
                     result?.scanRecord?.run {
-                        val proximityKey =
-                            getKey(
-                                bytes
-                            )
-                        Log.i(Const.TAG, "Corona::onScanResult proximity key found $proximityKey")
+                        val proximityKey = getKey(bytes)
+                        val rxRssi = result.rssi
+                        //TODO look for txpower from data
+                        val txPower = if (Build.VERSION.SDK_INT >= 26) {
+                            result.txPower
+                        } else {
+                            -50
+                        }
+                        Log.i(Const.TAG, "Covid19::onScanResult proximity key found $proximityKey")
                         KeyEmitter.run {
                             arrive(
-                                proximityKey
+                                ContactHistory.Contact(proximityKey, txPower, rxRssi)
                             )
                         }
                     }
@@ -147,15 +153,16 @@ object Covid19 : Observable() {
 
     object Advertisement : AdvertiseCallback() {
 
-        var proximityKey : UUID? = null
-        val bf = ByteBuffer.allocate(20).order(ByteOrder.BIG_ENDIAN)
+        private var proximityKey : UUID? = null
+        private val bf = ByteBuffer.allocate(20).order(ByteOrder.BIG_ENDIAN)
 
         override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
+            Log.v(Const.TAG,"Covid19::onStartSuccess")
             super.onStartSuccess(settingsInEffect)
         }
 
         override fun onStartFailure(errorCode: Int) {
-            Log.e(Const.TAG, "Corona::onStartFailer $errorCode")
+            Log.e(Const.TAG, "Covid19::onStartFailer $errorCode")
             advertising = false
             setChanged()
             notifyObservers()
@@ -182,9 +189,9 @@ object Covid19 : Observable() {
     }
 
     object KeyEmitter : Observable() {
-        fun arrive(key : UUID) {
+        fun arrive(contact : ContactHistory.Contact) {
             setChanged()
-            notifyObservers(key)
+            notifyObservers(contact)
         }
     }
 }

@@ -82,14 +82,17 @@ class BleService : Service(), Observer {
 
     override fun onUnbind(intent: Intent?): Boolean {
         Log.v(Const.TAG, "BleService::onUnbind")
+        if (!Covid19.isAdvertising() and !Covid19.isRunning()) {
+            stopForeground(true)
+        }
         return super.onUnbind(intent)
     }
 
     override fun update(o: Observable?, arg: Any?) {
         when {
             o is Covid19.KeyEmitter -> {
-                val key = arg as UUID
-                ContactHistory.record(history, key)
+                val contact = arg as ContactHistory.Contact
+                ContactHistory.record(history, contact)
             }
             o is BleSetup -> {
                 val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

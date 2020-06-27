@@ -16,17 +16,21 @@ object ContactHistory {
         const val TABLE_NAME = "history"
         const val COLUMN_NAME_TIME = "time"
         const val COLUMN_NAME_PROXYMITY_KEY = "proximity_key"
+        const val COLUMN_NAME_TX_POWER = "tx_rssi"
+        const val COLUMN_NAME_RX_RSSI = "rx_rssi"
     }
 
     private const val SQL_CREATE_ENTRIES =
         "CREATE TABLE ${History.TABLE_NAME} (" +
                 "${BaseColumns._ID} INTEGER PRIMARY KEY," +
                 "${History.COLUMN_NAME_TIME} TEXT not NULL," +
-                "${History.COLUMN_NAME_PROXYMITY_KEY} TEXT not NULL)"
+                "${History.COLUMN_NAME_PROXYMITY_KEY} TEXT not NULL, " +
+                "${History.COLUMN_NAME_TX_POWER} INTEGER, " +
+                "${History.COLUMN_NAME_RX_RSSI} INTEGER)"
 
     private const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${History.TABLE_NAME}"
 
-    val DATABASE_NAME = "history.db"
+    private val DATABASE_NAME = "history.db"
     private val DATABASE_VERSION = 1
 
     class HistoryDB(context : Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -51,7 +55,9 @@ object ContactHistory {
             result.add(
                 Contact(
                     uuid,
-                    cursor.getString(cursor.getColumnIndex(History.COLUMN_NAME_TIME))
+                    cursor.getString(cursor.getColumnIndex(History.COLUMN_NAME_TIME)),
+                    cursor.getInt(cursor.getColumnIndex(History.COLUMN_NAME_TX_POWER)),
+                    cursor.getInt(cursor.getColumnIndex(History.COLUMN_NAME_RX_RSSI))
                 )
             )
         }
@@ -84,16 +90,30 @@ object ContactHistory {
             result.add(
                 Contact(
                     uuid,
-                    cursor.getString(cursor.getColumnIndex(History.COLUMN_NAME_TIME))
+                    cursor.getString(cursor.getColumnIndex(History.COLUMN_NAME_TIME)),
+                    cursor.getInt(cursor.getColumnIndex(History.COLUMN_NAME_TX_POWER)),
+                    cursor.getInt(cursor.getColumnIndex(History.COLUMN_NAME_RX_RSSI))
                 )
             )
+
         }
         cursor.close()
         return result
     }
 
-    fun record(db : SQLiteDatabase, key : UUID) {
-        val contact = Contact(key)
+    fun record(db : SQLiteDatabase, contact : Contact) {
+        val values = ContentValues().apply {
+            val isoDate = sdf.format(contact.date)
+            put(History.COLUMN_NAME_TIME, isoDate)
+            put(History.COLUMN_NAME_PROXYMITY_KEY, contact.uuid.toString())
+            put(History.COLUMN_NAME_TX_POWER, contact.txPower)
+            put(History.COLUMN_NAME_RX_RSSI, contact.rxRssi)
+        }
+        val id = db.insert(History.TABLE_NAME, null, values)
+        Log.v("TAG", "ContactHisory::record inserted $id")
+    }
+    fun record(db : SQLiteDatabase, key : UUID, txRssi : Int, rxRssi : Int) {
+        val contact = Contact(key, txRssi, rxRssi)
         val values = ContentValues().apply {
             val isoDate = sdf.format(contact.date)
             put(History.COLUMN_NAME_TIME, isoDate)
@@ -106,17 +126,23 @@ object ContactHistory {
     class Contact() {
         lateinit var uuid : UUID
         lateinit var date : Date
-        constructor(key : UUID, now : Date) : this() {
+        var txPower : Int = 0
+        var rxRssi : Int = 0
+        constructor(key : UUID, now : Date, txPower : Int, rxRssi : Int) : this() {
             uuid = key
             date = now
+            this.txPower = txPower
+            this.rxRssi = rxRssi
         }
-        constructor(key : UUID) : this(key, Date()) {
+        constructor(key : UUID, txRssi : Int, rxRssi : Int) : this(key, Date(), txRssi, rxRssi) {
         }
-        constructor(key : UUID, isoDate : String) : this() {
+        constructor(key : UUID, isoDate : String, txPower : Int, rxRssi : Int) : this() {
             uuid = key
-            sdf.parse(isoDate).run {
+            sdf.parse(isoDate)?.run {
                 this@Contact.date = this
             }
+            this.txPower = txPower
+            this.rxRssi = rxRssi
         }
     }
 
