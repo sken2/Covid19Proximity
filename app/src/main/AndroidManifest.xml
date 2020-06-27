@@ -15,17 +15,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity
-            android:name=".DatabaseMaintenanceActivity"
-            android:label="@string/title_activity_database_maintenance"
-            android:theme="@style/AppTheme.NoActionBar">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
-        </activity>
-
         <service
             android:name=".BleService"
             android:enabled="true"
@@ -34,7 +23,7 @@
                 <action android:name="android.bluetooth.adapter.action.CONNECTION_STATE_CHANGED" />
             </intent-filter>
         </service>
-
+        <service android:name=".tasks.ContactDBService"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleInstance">
