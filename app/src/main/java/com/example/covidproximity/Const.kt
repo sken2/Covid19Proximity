@@ -16,5 +16,6 @@ object Const {
         val REQUEST_PREVILEAGES = 456
         val REQUEST_ENABLE_LOCATION = 789
         val NOTIFY_FOREGROUND = 999
+        val REQUEST_CODE = 4649
     }
 }
