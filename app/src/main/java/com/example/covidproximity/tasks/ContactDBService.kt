@@ -4,7 +4,9 @@ import android.app.Service
 import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
 import android.os.Binder
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import com.example.covidproximity.Const
 import com.example.covidproximity.adapters.HistoryDBWrapper
@@ -51,12 +53,15 @@ class ContactDBService : Service(), Observer {
             val result = ContactModel.getAll(contact)
             resultDispenser.complete(result)
         }
+        future.get()
     }
 
     class ResultDispenser() : Observable() {
         fun complete(result : Any) {
             setChanged()
-            notifyObservers(result)
+            Handler(Looper.getMainLooper()).post {
+                notifyObservers(result)
+            }
         }
     }
 

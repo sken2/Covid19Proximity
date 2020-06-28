@@ -32,18 +32,26 @@ class ContactAdapter(val db : SQLiteDatabase) :
 
     class HistoryHolder(itemView: ViewGroup) : RecyclerView.ViewHolder(itemView)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryHolder {
-        Log.v(Const.TAG, "ContactAdapter::onCreateViewHolder")
-        val frame = LayoutInflater.from(parent.context).inflate(R.layout.layout_history_record, parent, false) as ViewGroup
-        with(parent.context.applicationContext) {
-            Intent(parent.context.applicationContext, ContactDBService::class.java).also {
-                bindService(it, connection, Service.BIND_AUTO_CREATE)
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        Log.v(Const.TAG, "ContactAdapter::onAttachedToRecyclerView")
+        with(recyclerView.context.applicationContext) {
+            android.content.Intent(
+                this,
+                com.example.covidproximity.tasks.ContactDBService::class.java
+            ).also {
+                bindService(it, connection, android.app.Service.BIND_AUTO_CREATE)
                 afterBind.add {
                     dbService?.resultDispenser?.addObserver(this@ContactAdapter)
                     dbService?.getAllHistory()
                 }
             }
         }
+        super.onAttachedToRecyclerView(recyclerView)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryHolder {
+        Log.v(Const.TAG, "ContactAdapter::onCreateViewHolder")
+        val frame = LayoutInflater.from(parent.context).inflate(R.layout.layout_history_record, parent, false) as ViewGroup
         return HistoryHolder(
             frame
         )
@@ -64,6 +72,7 @@ class ContactAdapter(val db : SQLiteDatabase) :
     }
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        Log.v(Const.TAG, "ContactAdapter::onDetachedFromRecyclerView")
         dbService?.resultDispenser?.deleteObserver(this)
         recyclerView.context.applicationContext.unbindService(connection)
         super.onDetachedFromRecyclerView(recyclerView)
@@ -87,6 +96,7 @@ class ContactAdapter(val db : SQLiteDatabase) :
         if (o is ContactDBService.ResultDispenser) {
             val result = arg as List<ContactModel.Contact>
             list.addAll(result)
+            notifyDataSetChanged()
         }
     }
 }

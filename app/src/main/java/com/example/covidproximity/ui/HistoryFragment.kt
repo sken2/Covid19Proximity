@@ -1,15 +1,17 @@
 package com.example.covidproximity.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.Button
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.covidproximity.Const
 import com.example.covidproximity.adapters.ContactAdapter
 import com.example.covidproximity.R
-import com.example.covidproximity.models.ContactModel
+import com.example.covidproximity.adapters.HistoryDBWrapper
 
 class HistoryFragment : Fragment() {
 
@@ -19,10 +21,12 @@ class HistoryFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.v(Const.TAG, "HistoryFragment::onCreateView")
         return inflater.inflate(R.layout.fragment_history, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Log.v(Const.TAG, "HistoryFragment::onViewCreated")
         super.onViewCreated(view, savedInstanceState)
 
         view.findViewById<Button>(R.id.button_second).setOnClickListener {
@@ -35,13 +39,18 @@ class HistoryFragment : Fragment() {
             setHasFixedSize(true)
             layoutManager = manager
             adapter = ContactAdapter(
-                ContactModel.HistoryDB(view.context).readableDatabase
+                HistoryDBWrapper(view.context).readableDatabase
             )
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.option_menu, menu)
-        return
+    override fun onDestroyView() {
+        Log.v(Const.TAG, "HistoryFragment::onDestroyView")
+        super.onDestroyView()
     }
+
+//    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+//        inflater.inflate(R.menu.option_menu, menu)
+//        return
+//    }
 }
