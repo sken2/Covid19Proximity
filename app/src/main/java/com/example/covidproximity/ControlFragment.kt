@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Switch
 import androidx.navigation.fragment.findNavController
-import com.example.covidproximity.key.Covid19
+import com.example.covidproximity.entities.Covid19
 import java.util.*
 
 class ControlFragment : Fragment(), Observer {

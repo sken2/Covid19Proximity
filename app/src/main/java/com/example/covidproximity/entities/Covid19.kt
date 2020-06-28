@@ -1,4 +1,4 @@
-package com.example.covidproximity.key
+package com.example.covidproximity.entities
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.*

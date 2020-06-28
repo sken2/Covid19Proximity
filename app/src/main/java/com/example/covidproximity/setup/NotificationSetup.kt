@@ -11,7 +11,6 @@ import android.graphics.Typeface
 import android.os.Build
 import android.provider.Settings
 import android.text.Spannable
-import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.StyleSpan
 import android.util.Log
@@ -19,7 +18,7 @@ import com.example.covidproximity.BleService
 import com.example.covidproximity.Const
 import com.example.covidproximity.MainActivity
 import com.example.covidproximity.R
-import com.example.covidproximity.key.Covid19
+import com.example.covidproximity.entities.Covid19
 
 object NotificationSetup {
 

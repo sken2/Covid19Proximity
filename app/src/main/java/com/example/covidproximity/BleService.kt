@@ -11,7 +11,7 @@ import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
-import com.example.covidproximity.key.Covid19
+import com.example.covidproximity.entities.Covid19
 import com.example.covidproximity.models.ContactHistory
 import com.example.covidproximity.setup.BleSetup
 import com.example.covidproximity.setup.NotificationSetup
