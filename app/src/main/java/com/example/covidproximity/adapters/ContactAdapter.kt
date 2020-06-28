@@ -1,4 +1,4 @@
-package com.example.covidproximity
+package com.example.covidproximity.adapters
 
 import android.app.Service
 import android.content.ComponentName
@@ -11,6 +11,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.covidproximity.Const
+import com.example.covidproximity.R
 import com.example.covidproximity.models.ContactModel
 import com.example.covidproximity.tasks.ContactDBService
 import java.util.*
@@ -42,7 +44,9 @@ class ContactAdapter(val db : SQLiteDatabase) :
                 }
             }
         }
-        return HistoryHolder(frame)
+        return HistoryHolder(
+            frame
+        )
     }
 
     override fun getItemCount(): Int {

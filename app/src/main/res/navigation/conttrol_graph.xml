@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/controlFragment"
-        android:name="com.example.covidproximity.ControlFragment"
+        android:name="com.example.covidproximity.ui.ControlFragment"
         android:label="fragment_control"
         tools:layout="@layout/fragment_control" >
         <action
@@ -19,7 +19,7 @@
     </fragment>
     <fragment
         android:id="@+id/historyFragment"
-        android:name="com.example.covidproximity.HistoryFragment"
+        android:name="com.example.covidproximity.ui.HistoryFragment"
         android:label="fragment_history"
         tools:layout="@layout/fragment_history" >
         <action
@@ -28,7 +28,7 @@
     </fragment>
     <fragment
         android:id="@+id/setupFlagment"
-        android:name="com.example.covidproximity.SetupFlagment"
+        android:name="com.example.covidproximity.ui.SetupFlagment"
         android:label="SetupFlagment" />
     <fragment
         android:id="@+id/settingsFragment"

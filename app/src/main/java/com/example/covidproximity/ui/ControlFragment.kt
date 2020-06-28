@@ -1,4 +1,4 @@
-package com.example.covidproximity
+package com.example.covidproximity.ui
 
 import android.os.Bundle
 import android.util.Log
@@ -9,6 +9,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Switch
 import androidx.navigation.fragment.findNavController
+import com.example.covidproximity.Const
+import com.example.covidproximity.MainActivity
+import com.example.covidproximity.R
 import com.example.covidproximity.entities.Covid19
 import java.util.*
 

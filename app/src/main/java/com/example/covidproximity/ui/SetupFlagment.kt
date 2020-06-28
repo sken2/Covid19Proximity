@@ -1,4 +1,4 @@
-package com.example.covidproximity
+package com.example.covidproximity.ui
 
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +10,8 @@ import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.covidproximity.Const
+import com.example.covidproximity.R
 import com.example.covidproximity.setup.BleSetup
 
 class SetupFlagment : Fragment() {
