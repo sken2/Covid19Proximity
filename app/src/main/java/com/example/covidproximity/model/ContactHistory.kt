@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
 import android.util.Log
+import com.example.covidproximity.Const
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -16,7 +17,7 @@ object ContactHistory {
         const val TABLE_NAME = "history"
         const val COLUMN_NAME_TIME = "time"
         const val COLUMN_NAME_PROXYMITY_KEY = "proximity_key"
-        const val COLUMN_NAME_TX_POWER = "tx_rssi"
+        const val COLUMN_NAME_TX_POWER = "tx_power"
         const val COLUMN_NAME_RX_RSSI = "rx_rssi"
     }
 
@@ -29,9 +30,22 @@ object ContactHistory {
                 "${History.COLUMN_NAME_RX_RSSI} INTEGER)"
 
     private const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${History.TABLE_NAME}"
+    // version 1->2
+    object RoundKey : BaseColumns {
+        const val TABLE_NAME = "round"
+        const val COLUMN_NAME_TIME = "time"
+        const val COLUMN_NAME_PROXYMITY_KEY = "round_key"
+    }
+    private const val SQL_CREATE_ROUND_ENTRIES =
+        "CREATE TABLE ${RoundKey.TABLE_NAME} (" +
+                "${BaseColumns._ID} INTEGER PRIMARY KEY," +
+                "${RoundKey.COLUMN_NAME_TIME} TEXT not NULL, " +
+                "${RoundKey.COLUMN_NAME_PROXYMITY_KEY} TEXT not NULL)"
+
+    private const val SQL_DELETE_ROUND_ENTRIES = "DROP TABLE IF EXISTS ${RoundKey.TABLE_NAME}"
 
     private val DATABASE_NAME = "history.db"
-    private val DATABASE_VERSION = 1
+    private val DATABASE_VERSION = 2
 
     class HistoryDB(context : Context) : SQLiteOpenHelper(context,
         DATABASE_NAME, null,
@@ -40,11 +54,19 @@ object ContactHistory {
 
         override fun onCreate(db: SQLiteDatabase?) {
             db?.execSQL(SQL_CREATE_ENTRIES)
+            db?.execSQL(SQL_CREATE_ROUND_ENTRIES)
         }
 
         override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-            db?.execSQL(SQL_DELETE_ENTRIES)
-            onCreate(db)
+            Log.v(Const.TAG, "ContactHistory::onUpgrade oldVersion = $oldVersion newVersion = $newVersion")
+            when (oldVersion) {
+                1 -> {
+                    db?.execSQL(SQL_CREATE_ROUND_ENTRIES)
+                }
+                else -> {
+                    Log.e(Const.TAG, "ContactHistory::onUpgrade unknown version of current database: $oldVersion")
+                }
+            }
         }
     }
 
@@ -52,7 +74,9 @@ object ContactHistory {
         val result = mutableListOf<Contact>()
         val projection = arrayOf(
             History.COLUMN_NAME_TIME,
-            History.COLUMN_NAME_PROXYMITY_KEY
+            History.COLUMN_NAME_PROXYMITY_KEY,
+            History.COLUMN_NAME_TX_POWER,
+            History.COLUMN_NAME_RX_RSSI
         )
         val sortOrder = "${History.COLUMN_NAME_TIME} desc"
         val cursor = db.query(History.TABLE_NAME, projection, null, null, null, null, sortOrder)
@@ -92,7 +116,9 @@ object ContactHistory {
         val result = mutableListOf<Contact>()
         val projection = arrayOf(
             History.COLUMN_NAME_TIME,
-            History.COLUMN_NAME_PROXYMITY_KEY
+            History.COLUMN_NAME_PROXYMITY_KEY,
+            History.COLUMN_NAME_TX_POWER,
+            History.COLUMN_NAME_RX_RSSI
         )
         val selection =
             History.COLUMN_NAME_TIME
@@ -126,16 +152,17 @@ object ContactHistory {
         val id = db.insert(History.TABLE_NAME, null, values)
         Log.v("TAG", "ContactHisory::record inserted $id")
     }
-    fun record(db : SQLiteDatabase, key : UUID, txRssi : Int, rxRssi : Int) {
+    fun record(db : SQLiteDatabase, key : UUID, txPower : Int, rxRssi : Int) {
         val contact = Contact(
             key,
-            txRssi,
+            txPower,
             rxRssi
         )
         val values = ContentValues().apply {
             val isoDate = sdf.format(contact.date)
             put(History.COLUMN_NAME_TIME, isoDate)
             put(History.COLUMN_NAME_PROXYMITY_KEY, contact.uuid.toString())
+
         }
         val id = db.insert(History.TABLE_NAME, null, values)
         Log.v("TAG", "ContactHisory::record inserted $id")
@@ -152,7 +179,7 @@ object ContactHistory {
             this.txPower = txPower
             this.rxRssi = rxRssi
         }
-        constructor(key : UUID, txRssi : Int, rxRssi : Int) : this(key, Date(), txRssi, rxRssi) {
+        constructor(key : UUID, txPower: Int, rxRssi : Int) : this(key, Date(), txPower, rxRssi) {
         }
         constructor(key : UUID, isoDate : String, txPower : Int, rxRssi : Int) : this() {
             uuid = key
