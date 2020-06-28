@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/foo"
+    android:id="@+id/nav_graph_main_screen"
     app:startDestination="@id/controlFragment">
 
     <fragment
@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_controlFragment_to_setupFlagment"
             app:destination="@id/setupFlagment" />
+        <action
+            android:id="@+id/action_controlFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/historyFragment"
@@ -30,4 +33,8 @@
         android:id="@+id/setupFlagment"
         android:name="com.example.covidproximity.SetupFlagment"
         android:label="SetupFlagment" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.covidproximity.ui.SettingsFragment"
+        android:label="SettingsFragment" />
 </navigation>

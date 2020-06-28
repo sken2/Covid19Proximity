@@ -17,9 +17,13 @@ import android.text.SpannableStringBuilder
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import androidx.core.content.ContextCompat
+import androidx.navigation.findNavController
 import com.example.covidproximity.setup.BleSetup
 import com.example.covidproximity.setup.NotificationSetup
+import com.example.covidproximity.ui.SettingsFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
@@ -109,6 +113,23 @@ class MainActivity : AppCompatActivity() {
     ) {
         Log.v(Const.TAG, "MainActivity::onRequestPermissionsResult")
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.option_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Log.v(Const.TAG, "MainActivity::onOptionsItemSelected")
+        when (item.itemId) {
+            R.id.menu_settings -> {
+                findNavController(R.id.fragment_main).navigate(R.id.action_controlFragment_to_settingsFragment)
+                return true
+            }
+            else ->
+                return super.onOptionsItemSelected(item)
+        }
     }
 
     fun bluetoothSpec() : SpannableStringBuilder {
