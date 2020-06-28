@@ -19,25 +19,25 @@ import android.text.style.StyleSpan
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import com.example.covidproximity.setup.BleSetup
 import com.example.covidproximity.setup.NotificationSetup
-import com.example.covidproximity.ui.SettingsFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
 
-    val adapter by lazy {
+    private val adapter by lazy {
         BluetoothAdapter.getDefaultAdapter()
     }
     private val nm by lazy {
         getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
-    val backFab by lazy {
+    private val backFab by lazy {
         findViewById(R.id.fab_back) as FloatingActionButton
     }
-    var isBound = false
+    private var isBound = false
 
     var bleService : BleService? = null
 
@@ -46,6 +46,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
+        backFab.setOnClickListener {
+            findNavController(R.id.fragment_main).navigate(R.id.action_global_controlFragment)
+        }
         NotificationSetup.createChannel(this)
         val sevice = Intent(this, BleService::class.java)
         startService(sevice)
@@ -124,12 +127,16 @@ class MainActivity : AppCompatActivity() {
         Log.v(Const.TAG, "MainActivity::onOptionsItemSelected")
         when (item.itemId) {
             R.id.menu_settings -> {
-                findNavController(R.id.fragment_main).navigate(R.id.action_controlFragment_to_settingsFragment)
+                findNavController(R.id.fragment_main).navigate(R.id.action_global_settingsFragment)
                 return true
             }
             else ->
                 return super.onOptionsItemSelected(item)
         }
+    }
+
+    fun showBack(visible : Boolean = true) {
+        backFab.visibility = if (visible) View.VISIBLE else View.INVISIBLE
     }
 
     fun bluetoothSpec() : SpannableStringBuilder {

@@ -16,9 +16,6 @@
         <action
             android:id="@+id/action_controlFragment_to_setupFlagment"
             app:destination="@id/setupFlagment" />
-        <action
-            android:id="@+id/action_controlFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/historyFragment"
@@ -37,4 +34,5 @@
         android:id="@+id/settingsFragment"
         android:name="com.example.covidproximity.ui.SettingsFragment"
         android:label="SettingsFragment" />
+    <action android:id="@+id/action_global_settingsFragment" app:destination="@id/settingsFragment" /><action android:id="@+id/action_global_controlFragment" app:destination="@id/controlFragment"/>
 </navigation>

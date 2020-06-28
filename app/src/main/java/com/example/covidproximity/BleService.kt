@@ -11,6 +11,7 @@ import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
+import androidx.preference.PreferenceManager
 import com.example.covidproximity.entities.Covid19
 import com.example.covidproximity.models.ContactHistory
 import com.example.covidproximity.setup.BleSetup
@@ -22,7 +23,8 @@ class BleService : Service(), Observer {
     lateinit var db : ContactHistory.HistoryDB
     lateinit var history : SQLiteDatabase
     private val preferences : SharedPreferences by lazy {
-        this.applicationContext.getSharedPreferences(Const.PREFERENCE_NAME,Context.MODE_PRIVATE)
+        PreferenceManager.getDefaultSharedPreferences(this)
+//        this.applicationContext.getSharedPreferences(Const.PREFERENCE_NAME,Context.MODE_PRIVATE)
     }
     private val nm by lazy {
         getSystemService(Context.NOTIFICATION_SERVICE)
@@ -45,10 +47,10 @@ class BleService : Service(), Observer {
         intent?.run {
             when (BleSetup.getState()) {
                 BleSetup.Status.OK -> {
-                    if (preferences.getBoolean(Const.Preferences.AUTO_ADVERTISE, false)) {
+                   if (preferences.getBoolean(getString(R.string.key_auto_advertise), false)) {
                         Covid19.startAdvertising()
                     }
-                    if (preferences.getBoolean(Const.Preferences.AUTO_SCAN, false)) {
+                    if (preferences.getBoolean(getString(R.string.key_auto_scan), false)) {
                         Covid19.startScanning()
                     }
                 }
