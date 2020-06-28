@@ -9,7 +9,7 @@ import android.widget.Button
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.covidproximity.model.ContactHistory
+import com.example.covidproximity.models.ContactHistory
 
 class HistoryFragment : Fragment() {
 

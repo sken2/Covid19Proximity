@@ -7,7 +7,7 @@ import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import com.example.covidproximity.Const
-import com.example.covidproximity.model.ContactHistory
+import com.example.covidproximity.models.ContactHistory
 import java.util.*
 import java.util.concurrent.Executors
 

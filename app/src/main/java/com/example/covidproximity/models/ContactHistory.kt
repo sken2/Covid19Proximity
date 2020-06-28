@@ -1,4 +1,4 @@
-package com.example.covidproximity.model
+package com.example.covidproximity.models
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
