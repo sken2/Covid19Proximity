@@ -1,10 +1,8 @@
 package com.example.covidproximity
 
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -36,5 +34,10 @@ class HistoryFragment : Fragment() {
             layoutManager = manager
             adapter = ContactAdapter(ContactHistory.HistoryDB(view.context).readableDatabase)
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.option_menu, menu)
+        return
     }
 }
