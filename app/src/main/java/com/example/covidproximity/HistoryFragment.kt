@@ -7,7 +7,7 @@ import android.widget.Button
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.covidproximity.models.ContactHistory
+import com.example.covidproximity.models.ContactModel
 
 class HistoryFragment : Fragment() {
 
@@ -32,7 +32,7 @@ class HistoryFragment : Fragment() {
         view.findViewById<RecyclerView>(R.id.recycler_history).apply {
             setHasFixedSize(true)
             layoutManager = manager
-            adapter = ContactAdapter(ContactHistory.HistoryDB(view.context).readableDatabase)
+            adapter = ContactAdapter(ContactModel.HistoryDB(view.context).readableDatabase)
         }
     }
 

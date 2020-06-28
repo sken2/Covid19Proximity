@@ -11,7 +11,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.covidproximity.models.ContactHistory
+import com.example.covidproximity.models.ContactModel
 import com.example.covidproximity.tasks.ContactDBService
 import java.util.*
 
@@ -21,7 +21,7 @@ class ContactAdapter(val db : SQLiteDatabase) :
 {
 
     private var dbService : ContactDBService? = null
-    private val list = mutableListOf<ContactHistory.Contact>()
+    private val list = mutableListOf<ContactModel.Contact>()
     private val afterBind = LinkedList<() -> Unit>()
 
     init {
@@ -81,7 +81,7 @@ class ContactAdapter(val db : SQLiteDatabase) :
 
     override fun update(o: Observable?, arg: Any?) {
         if (o is ContactDBService.ResultDispenser) {
-            val result = arg as List<ContactHistory.Contact>
+            val result = arg as List<ContactModel.Contact>
             list.addAll(result)
         }
     }

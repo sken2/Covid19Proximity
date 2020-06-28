@@ -1,5 +1,8 @@
 package com.example.covidproximity
 
+import android.annotation.SuppressLint
+import java.text.SimpleDateFormat
+
 object Const {
 
     val TAG = "CoronaProximity"
@@ -18,4 +21,7 @@ object Const {
         val NOTIFY_FOREGROUND = 999
         val REQUEST_CODE = 4649
     }
+
+    @SuppressLint("SimpleDateFormat")
+    val ISO8601 = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
 }

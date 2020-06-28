@@ -12,16 +12,17 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
+import com.example.covidproximity.adapters.HistoryDBWrapper
 import com.example.covidproximity.entities.Covid19
-import com.example.covidproximity.models.ContactHistory
+import com.example.covidproximity.models.ContactModel
 import com.example.covidproximity.setup.BleSetup
 import com.example.covidproximity.setup.NotificationSetup
 import java.util.*
 
 class BleService : Service(), Observer {
 
-    lateinit var db : ContactHistory.HistoryDB
-    lateinit var history : SQLiteDatabase
+    lateinit var db : HistoryDBWrapper
+    lateinit var contactDb : SQLiteDatabase
     private val preferences : SharedPreferences by lazy {
         PreferenceManager.getDefaultSharedPreferences(this)
 //        this.applicationContext.getSharedPreferences(Const.PREFERENCE_NAME,Context.MODE_PRIVATE)
@@ -34,8 +35,8 @@ class BleService : Service(), Observer {
         Log.v(Const.TAG, "BleService::onCreate")
         super.onCreate()
         goForeground()
-        db = ContactHistory.HistoryDB(this)
-        history = db.writableDatabase
+        db = HistoryDBWrapper(this)
+        contactDb = db.writableDatabase
         val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
         registerReceiver(BleSetup.btReceiver, filter)
         Covid19.KeyEmitter.addObserver(this)
@@ -68,7 +69,7 @@ class BleService : Service(), Observer {
         Log.v(Const.TAG, "BleService::onDestroy")
         BleSetup.deleteObserver(this)
         Covid19.KeyEmitter.deleteObserver(this)
-        history.close()
+        contactDb.close()
         db.close()
         unregisterReceiver(BleSetup.btReceiver)
         super.onDestroy()
@@ -90,8 +91,8 @@ class BleService : Service(), Observer {
     override fun update(o: Observable?, arg: Any?) {
         when {
             o is Covid19.KeyEmitter -> {
-                val contact = arg as ContactHistory.Contact
-                ContactHistory.record(history, contact)
+                val contact = arg as ContactModel.Contact
+                ContactModel.record(contactDb, contact)
             }
             o is BleSetup -> {
                 val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

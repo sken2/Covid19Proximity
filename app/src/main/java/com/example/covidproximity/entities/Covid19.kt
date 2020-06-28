@@ -6,7 +6,7 @@ import android.os.Build
 import android.os.ParcelUuid
 import android.util.Log
 import com.example.covidproximity.Const
-import com.example.covidproximity.models.ContactHistory
+import com.example.covidproximity.models.ContactModel
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
@@ -104,7 +104,7 @@ object Covid19 : Observable() {
                         Log.i(Const.TAG, "Covid19::onScanResult proximity key found $proximityKey")
                         KeyEmitter.run {
                             arrive(
-                                ContactHistory.Contact(proximityKey, txPower, rxRssi)
+                                ContactModel.Contact(proximityKey, txPower, rxRssi)
                             )
                         }
                     }
@@ -189,7 +189,7 @@ object Covid19 : Observable() {
     }
 
     object KeyEmitter : Observable() {
-        fun arrive(contact : ContactHistory.Contact) {
+        fun arrive(contact : ContactModel.Contact) {
             setChanged()
             notifyObservers(contact)
         }

@@ -7,14 +7,15 @@ import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import com.example.covidproximity.Const
-import com.example.covidproximity.models.ContactHistory
+import com.example.covidproximity.adapters.HistoryDBWrapper
+import com.example.covidproximity.models.ContactModel
 import java.util.*
 import java.util.concurrent.Executors
 
 class ContactDBService : Service(), Observer {
 
     private val executor = Executors.newFixedThreadPool(2)
-    lateinit var db : ContactHistory.HistoryDB
+    lateinit var db : HistoryDBWrapper
     lateinit var contact : SQLiteDatabase
     val resultDispenser = ResultDispenser()
 
@@ -24,8 +25,8 @@ class ContactDBService : Service(), Observer {
 
     override fun onCreate() {
         super.onCreate()
-        db = ContactHistory.HistoryDB(this)
-        contact = db?.readableDatabase
+        db = HistoryDBWrapper(this)
+        contact = db.readableDatabase
     }
 
     override fun onDestroy() {
@@ -47,7 +48,7 @@ class ContactDBService : Service(), Observer {
 
     fun getAllHistory() {
         val future = executor.submit{
-            val result = ContactHistory.getAll(contact)
+            val result = ContactModel.getAll(contact)
             resultDispenser.complete(result)
         }
     }
