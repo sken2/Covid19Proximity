@@ -37,7 +37,9 @@ class ControlFragment : Fragment(), Observer {
                 this.isChecked = Covid19.isAdvertising()
                 this.setOnCheckedChangeListener { buttonView, isChecked ->
                     if (isChecked) {
-                        Covid19.startAdvertising()
+                        this.context?.run {
+                            Covid19.startAdvertising()
+                        }
                     } else {
                         Covid19.stopAdvertising()
                     }
