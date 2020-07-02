@@ -96,7 +96,7 @@ class BleService : Service(), Observer {
             }
             o is BleSetup -> {
                 val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                nm.notify(Const.Resuest.NOTIFY_FOREGROUND, NotificationSetup.newNotification(this))
+                nm.notify(Const.Requests.NOTIFY_FOREGROUND, NotificationSetup.newNotification(this))
             }
             else -> {
                 Log.e(Const.TAG, "BleService::update unknown update from $o")
@@ -107,13 +107,13 @@ class BleService : Service(), Observer {
     fun shutdown() {
         stopSelf()
         with(NotificationManagerCompat.from(this)) {
-            cancel(Const.Resuest.NOTIFY_FOREGROUND)
+            cancel(Const.Requests.NOTIFY_FOREGROUND)
         }
     }
 
     private fun goForeground() {
         Log.v(Const.TAG, "BleService::goForeground")
-        startForeground(Const.Resuest.NOTIFY_FOREGROUND, NotificationSetup.newNotification(this))
+        startForeground(Const.Requests.NOTIFY_FOREGROUND, NotificationSetup.newNotification(this))
     }
 
     inner class LocalBinder() : Binder() {

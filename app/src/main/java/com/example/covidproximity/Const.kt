@@ -14,7 +14,7 @@ object Const {
     }
     val UUID = "0000fd6f-0000-1000-8000-00805f9b34fb"
 
-    object Resuest {
+    object Requests {
         val REQUEST_ENABLE_BT = 123
         val REQUEST_PREVILEAGES = 456
         val REQUEST_ENABLE_LOCATION = 789

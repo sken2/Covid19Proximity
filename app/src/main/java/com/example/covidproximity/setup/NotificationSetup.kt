@@ -20,6 +20,12 @@ import com.example.covidproximity.MainActivity
 import com.example.covidproximity.R
 import com.example.covidproximity.entities.Covid19
 
+/**
+ * NotificationSetup
+ *
+ *
+ * 2020.7.2
+ */
 object NotificationSetup {
 
     fun createChannel(context : Context) {
@@ -28,7 +34,7 @@ object NotificationSetup {
                 val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 val name = "status"
                 val description = "information about current situation"
-                val channelId = getString(R.string.not_channel_id)
+                val channelId = getString(R.string.notify_channel_id)
                 val channel = NotificationChannel(channelId, name, NotificationManager.IMPORTANCE_LOW)
                 channel.description = description
                 nm.createNotificationChannel(channel)
@@ -46,7 +52,7 @@ object NotificationSetup {
             val intent = requestIntent(this)
             val builder =
                 if (Build.VERSION.SDK_INT >= 26) {
-                    val channelId = getString(R.string.not_channel_id)
+                    val channelId = getString(R.string.notify_channel_id)
                     Notification.Builder(this, channelId)
                 } else {
                     Notification.Builder(this)
@@ -78,28 +84,28 @@ object NotificationSetup {
             when (BleSetup.getState()) {
                 BleSetup.Status.OK -> {
                     return PendingIntent.getActivity(
-                        this.applicationContext, Const.Resuest.REQUEST_CODE, Intent(this, MainActivity::class.java), PendingIntent.FLAG_CANCEL_CURRENT
+                        this.applicationContext, Const.Requests.REQUEST_CODE, Intent(this, MainActivity::class.java), PendingIntent.FLAG_CANCEL_CURRENT
                     )
                 }
                 BleSetup.Status.ADAPTER_IS_OFF -> {
                     return PendingIntent.getActivity(
-                        this.applicationContext, Const.Resuest.REQUEST_CODE, Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), PendingIntent.FLAG_CANCEL_CURRENT
+                        this.applicationContext, Const.Requests.REQUEST_CODE, Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), PendingIntent.FLAG_CANCEL_CURRENT
                     )
                 }
                 BleSetup.Status.LOCATION_IS_OFF -> {
                     return PendingIntent.getActivity(
-                        this.applicationContext, Const.Resuest.REQUEST_CODE, Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), PendingIntent.FLAG_CANCEL_CURRENT
+                        this.applicationContext, Const.Requests.REQUEST_CODE, Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), PendingIntent.FLAG_CANCEL_CURRENT
                     )
                 }
                 BleSetup.Status.NEED_PRIVILAGE -> {
                     return PendingIntent.getActivity(
-                        this.applicationContext, Const.Resuest.REQUEST_CODE, Intent(this, MainActivity::class.java), PendingIntent.FLAG_CANCEL_CURRENT
+                        this.applicationContext, Const.Requests.REQUEST_CODE, Intent(this, MainActivity::class.java), PendingIntent.FLAG_CANCEL_CURRENT
                     )
                 }
                 else -> {
                     Log.e(Const.TAG, "BleService::requestIntent state unimplemented")
                     return PendingIntent.getService(
-                        this.applicationContext, Const.Resuest.REQUEST_CODE, Intent(this, BleService::class.java), PendingIntent.FLAG_CANCEL_CURRENT
+                        this.applicationContext, Const.Requests.REQUEST_CODE, Intent(this, BleService::class.java), PendingIntent.FLAG_CANCEL_CURRENT
                     )
                 }
             }

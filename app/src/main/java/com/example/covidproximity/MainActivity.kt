@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 if (previleageNeeded.isNotEmpty()) {
-                    requestPermissions(previleageNeeded, Const.Resuest.REQUEST_PREVILEAGES)
+                    requestPermissions(previleageNeeded, Const.Requests.REQUEST_PREVILEAGES)
                 }
             }
             else -> {}  // other request is issued by BleService
@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
-            Const.Resuest.REQUEST_PREVILEAGES, Const.Resuest.REQUEST_ENABLE_LOCATION -> {
+            Const.Requests.REQUEST_PREVILEAGES, Const.Requests.REQUEST_ENABLE_LOCATION -> {
                 Log.v(Const.TAG, "MainActivity::onActivityResult resultCode = $resultCode")
                 BleSetup.onLocationChanged(this)
             }
