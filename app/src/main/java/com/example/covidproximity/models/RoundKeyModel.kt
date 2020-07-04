@@ -22,7 +22,7 @@ object RoundKeyModel {
 
     const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${RoundKeyTable.TABLE_NAME}"
 
-    fun recore(db : SQLiteDatabase, roundKey : RoundKey) {
+    fun recored(db : SQLiteDatabase, roundKey : RoundKey) {
         val values = ContentValues().apply {
             val isoDate = Const.ISO8601.format(roundKey.used)
             put(RoundKeyTable.COLUMN_NAME_TIME, isoDate)
