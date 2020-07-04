@@ -15,4 +15,6 @@
     <string name="menu_item_today">Today</string>
     <string name="menu_item_week">One Week</string>
     <string name="menu_item_two_week">Two weeks</string>
+    <string name="menu_title_summarize">Summarize</string>
+    <string name="menu_detail">Detail</string>
 </resources>

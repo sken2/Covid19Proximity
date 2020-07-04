@@ -10,4 +10,10 @@
     <item
         android:id="@+id/menu_two_weeks"
         android:title="@string/menu_item_two_week" />
+    <item
+        android:id="@+id/menu_summarize"
+        android:title="@string/menu_title_summarize" />
+    <item
+        android:id="@+id/menu_detail"
+        android:title="@string/menu_detail" />
 </menu>
