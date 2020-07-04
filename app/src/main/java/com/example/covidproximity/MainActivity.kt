@@ -38,6 +38,8 @@ class MainActivity : AppCompatActivity() {
         findViewById(R.id.fab_back) as FloatingActionButton
     }
     private var isBound = false
+    private val defaultMenuId = R.menu.option_menu
+    private var menuId = defaultMenuId
 
     var bleService : BleService? = null
 
@@ -119,7 +121,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.option_menu, menu)
+        menuInflater.inflate(menuId, menu)
         return true
     }
 
@@ -133,6 +135,16 @@ class MainActivity : AppCompatActivity() {
             else ->
                 return super.onOptionsItemSelected(item)
         }
+    }
+
+    fun setMenu(menuId : Int) {
+        this.menuId = menuId
+        invalidateOptionsMenu()
+    }
+
+    fun setDefaultMenu() {
+        this.menuId = defaultMenuId
+        invalidateOptionsMenu()
     }
 
     fun showBack(visible : Boolean = true) {
