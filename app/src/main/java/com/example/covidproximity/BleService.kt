@@ -15,6 +15,7 @@ import androidx.preference.PreferenceManager
 import com.example.covidproximity.adapters.HistoryDBWrapper
 import com.example.covidproximity.entities.Covid19
 import com.example.covidproximity.models.ContactModel
+import com.example.covidproximity.models.RoundKeyModel
 import com.example.covidproximity.setup.BleSetup
 import com.example.covidproximity.setup.NotificationSetup
 import java.util.*
@@ -49,7 +50,7 @@ class BleService : Service(), Observer {
             when (BleSetup.getState()) {
                 BleSetup.Status.OK -> {
                    if (preferences.getBoolean(getString(R.string.key_auto_advertise), false)) {
-                        Covid19.startAdvertising()
+                        Covid19.KeyDispenser.start(this@BleService)
                     }
                     if (preferences.getBoolean(getString(R.string.key_auto_scan), false)) {
                         Covid19.startScanning()
@@ -82,7 +83,7 @@ class BleService : Service(), Observer {
 
     override fun onUnbind(intent: Intent?): Boolean {
         Log.v(Const.TAG, "BleService::onUnbind")
-        if (!Covid19.isAdvertising() and !Covid19.isRunning()) {
+        if (!Covid19.isRunning()) {
             stopForeground(true)
         }
         return super.onUnbind(intent)
@@ -93,6 +94,14 @@ class BleService : Service(), Observer {
             o is Covid19.KeyEmitter -> {
                 val contact = arg as ContactModel.Contact
                 ContactModel.record(contactDb, contact)
+            }
+            o is Covid19.KeyDispenser -> {
+                val newKey = arg as UUID
+                if (Covid19.isAdvertising()) {
+                    Covid19.stopAdvertising()
+                }
+                RoundKeyModel.recored(contactDb, RoundKeyModel.RoundKey(newKey.toString()))
+                Covid19.startAdvertising(newKey)
             }
             o is BleSetup -> {
                 val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

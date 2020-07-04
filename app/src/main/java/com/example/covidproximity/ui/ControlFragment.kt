@@ -41,10 +41,15 @@ class ControlFragment : Fragment(), Observer {
                 this.setOnCheckedChangeListener { buttonView, isChecked ->
                     if (isChecked) {
                         this.context?.run {
-                            Covid19.startAdvertising()
+                            if (context is MainActivity) {
+                                val mainActivity = context as MainActivity
+                                mainActivity?.bleService?.let {
+                                    Covid19.KeyDispenser.start(it)
+                                }
+                            }
                         }
                     } else {
-                        Covid19.stopAdvertising()
+                        Covid19.KeyDispenser.stop()
                     }
                 }
             }
