@@ -1,8 +1,12 @@
 package com.example.covidproximity.entities
 
+import android.app.AlarmManager
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.*
+import android.content.Context
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.os.ParcelUuid
 import android.util.Log
 import com.example.covidproximity.Const
@@ -32,23 +36,20 @@ object Covid19 : Observable() {
     }
 
     fun isRunning() : Boolean {
-        return scanning and advertising
+        return scanning or advertising
     }
 
     fun isAdvertising() = advertising
 
     fun isScanning() = scanning
 
-    fun startAdvertising() {
+    fun startAdvertising(proximityKey : UUID) {
         if (!advertising) {
             adapter?.bluetoothLeAdvertiser?.startAdvertising(
                 Advertisement.getSettings(),
-                Advertisement.getData(),
+                Advertisement.getData(proximityKey),
                 Advertisement
             )
-            advertising = true
-            setChanged()
-            notifyObservers()
         }
     }
 
@@ -56,9 +57,6 @@ object Covid19 : Observable() {
         adapter?.bluetoothLeAdvertiser?.stopAdvertising(
             Advertisement
         )
-        advertising = false
-        setChanged()
-        notifyObservers()
     }
 
     fun startScanning() {
@@ -79,6 +77,19 @@ object Covid19 : Observable() {
             Scanning
         )
         scanning = false
+        setChanged()
+        notifyObservers()
+    }
+
+    private fun onKeyCycleStarted() {
+        advertising = true
+        setChanged()
+        notifyObservers()
+    }
+
+    private fun onKeyCycleStopped() {
+        stopAdvertising()
+        advertising = false
         setChanged()
         notifyObservers()
     }
@@ -153,7 +164,7 @@ object Covid19 : Observable() {
 
     object Advertisement : AdvertiseCallback() {
 
-        private var proximityKey : UUID? = null
+//        private var proximityKey : UUID? = null
         private val bf = ByteBuffer.allocate(20).order(ByteOrder.BIG_ENDIAN)
 
         override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
@@ -174,10 +185,11 @@ object Covid19 : Observable() {
                 .build()
         }
 
-        fun getData() : AdvertiseData {
+        fun getData(proximityKey : UUID) : AdvertiseData {
             val builder = AdvertiseData.Builder()
                     .addServiceUuid(ParcelUuid(uuid))
-            proximityKey?.run {
+            proximityKey.run {
+                bf.rewind()
                 bf.put(19.toByte()) // 1+2+16
                 bf.put(0x16.toByte())   // type UUID
                 bf.put(0xfd.toByte()).put(0xf6.toByte())
@@ -192,6 +204,43 @@ object Covid19 : Observable() {
         fun arrive(contact : ContactModel.Contact) {
             setChanged()
             notifyObservers(contact)
+        }
+    }
+
+    object KeyDispenser : Observable(), AlarmManager.OnAlarmListener {
+
+        private var am : AlarmManager? = null
+
+        override fun onAlarm() {
+            val key = newKey()
+            Log.v(Const.TAG, "Covid19::onAlarm key = $key")
+            setChanged()
+            notifyObservers(key)
+            am?.setWindow(AlarmManager.RTC,
+                System.currentTimeMillis() + 15 * 60 * 1000,60 * 1000,
+                "foo", this@KeyDispenser, Handler(Looper.getMainLooper())
+            )
+        }
+
+        fun start(context : Context) {
+            with(context) {
+                if (context is Observer) {
+                    addObserver(context)
+                }
+                am = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                Covid19.onKeyCycleStarted()
+            }
+            onAlarm()
+        }
+
+        fun stop() {
+            am?.cancel(this)
+            onKeyCycleStopped()
+            deleteObservers()
+        }
+
+        fun newKey() : UUID {
+            return UUID.randomUUID()
         }
     }
 }
