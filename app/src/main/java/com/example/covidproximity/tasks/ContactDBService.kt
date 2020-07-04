@@ -12,6 +12,7 @@ import com.example.covidproximity.Const
 import com.example.covidproximity.adapters.HistoryDBWrapper
 import com.example.covidproximity.models.ContactModel
 import java.util.*
+import java.util.concurrent.CancellationException
 import java.util.concurrent.Executors
 
 class ContactDBService : Service(), Observer {
@@ -54,6 +55,18 @@ class ContactDBService : Service(), Observer {
             resultDispenser.complete(result)
         }
         future.get()
+    }
+
+    fun <T>access(query : (SQLiteDatabase) -> T) {
+        val future = executor.submit {
+            val result = query.invoke(contact)
+            resultDispenser.complete(result as Any)
+        }
+        try {
+            future.get()
+        } catch (e : CancellationException) {
+            Log.i(Const.TAG, "")
+        }
     }
 
     class ResultDispenser() : Observable() {

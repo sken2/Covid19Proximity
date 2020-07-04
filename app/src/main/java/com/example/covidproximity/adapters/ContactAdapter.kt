@@ -42,7 +42,7 @@ class ContactAdapter(val db : SQLiteDatabase) :
                 bindService(it, connection, android.app.Service.BIND_AUTO_CREATE)
                 afterBind.add {
                     dbService?.resultDispenser?.addObserver(this@ContactAdapter)
-                    dbService?.getAllHistory()
+                    dbService?.access{ db -> ContactModel.getAll(db)}
                 }
             }
         }
