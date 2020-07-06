@@ -2,9 +2,13 @@ package com.example.covidproximity.models
 
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
+import android.os.Build
 import android.provider.BaseColumns
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.example.covidproximity.Const
+import java.time.LocalDate
+import java.time.ZoneOffset
 import java.util.*
 
 object ContactModel {
@@ -54,23 +58,17 @@ object ContactModel {
     }
 
     fun getToday(db : SQLiteDatabase) : List<Contact> {
-        val now = Date()
-        val start = now.apply {
-            time = 0
-            minutes = 0
-            seconds = 0
+        if (Build.VERSION.SDK_INT >=26) {
+            val now = LocalDate.now()
+            val start = now.atStartOfDay()
+            val end = start.plusDays(1)
+            return getWhile(db, start.toInstant(ZoneOffset.UTC).toString() ,end.toInstant(ZoneOffset.UTC).toString())
+        } else {
+            return emptyList()  //　TODO off course
         }
-        val end = start.apply {
-            date += 1
-        }
-        return getWhile(
-            db,
-            start,
-            end
-        )
     }
 
-    fun getWhile(db: SQLiteDatabase, since : Date, till : Date) : List<Contact> {
+    fun getWhile(db: SQLiteDatabase, since : String, till : String) : List<Contact> {
         val result = mutableListOf<Contact>()
         val projection = arrayOf(
             ContactTable.COLUMN_NAME_TIME,
@@ -79,10 +77,10 @@ object ContactModel {
             ContactTable.COLUMN_NAME_RX_RSSI
         )
         val selection =
-            ContactTable.COLUMN_NAME_TIME
-        val selectionArgs = arrayOf("between",  Const.ISO8601.format(since), "and", Const.ISO8601.format(till) )
+            "${ContactTable.COLUMN_NAME_TIME} BETWEEN  '$since' and '$till'"
+//        val selectionArgs = arrayOf("between",  Const.ISO8601.format(since), "and", Const.ISO8601.format(till) )
         val sortOrder = "${ContactTable.COLUMN_NAME_TIME} desc"
-        val cursor = db.query(ContactTable.TABLE_NAME, projection, selection, selectionArgs,null, null, sortOrder)
+        val cursor = db.query(ContactTable.TABLE_NAME, projection, selection, null,null, null, sortOrder)
         while (cursor.moveToNext()) {
             val uuid = UUID.fromString(cursor.getString(cursor.getColumnIndex(ContactTable.COLUMN_NAME_PROXYMITY_KEY)))
             result.add(
@@ -93,7 +91,6 @@ object ContactModel {
                     cursor.getInt(cursor.getColumnIndex(ContactTable.COLUMN_NAME_RX_RSSI))
                 )
             )
-
         }
         cursor.close()
         return result
@@ -110,6 +107,7 @@ object ContactModel {
         val id = db.insert(ContactTable.TABLE_NAME, null, values)
         Log.v("TAG", "ContactModel::record inserted $id")
     }
+
     fun record(db : SQLiteDatabase, key : UUID, txPower : Int, rxRssi : Int) {
         val contact = Contact(
             key,
