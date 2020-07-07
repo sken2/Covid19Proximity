@@ -43,7 +43,7 @@ class ControlFragment : Fragment(), Observer {
                         this.context?.run {
                             if (context is MainActivity) {
                                 val mainActivity = context as MainActivity
-                                mainActivity?.bleService?.let {
+                                mainActivity.bleService?.let {
                                     Covid19.KeyDispenser.start(it)
                                 }
                             }
