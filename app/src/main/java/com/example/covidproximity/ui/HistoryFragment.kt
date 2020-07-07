@@ -23,7 +23,6 @@ class HistoryFragment : Fragment() {
         activity as MainActivity
     }
     private var detailMode = false
-    private var resetAdapter = true
     private var duration = InstrumentDuration.TODAY
     private var actionMode : androidx.appcompat.view.ActionMode? = null
     private val recyclerView by lazy {
@@ -56,7 +55,10 @@ class HistoryFragment : Fragment() {
         recyclerView?.apply {
             setHasFixedSize(true)
             layoutManager = manager
-            attachAdapter(this)
+            val viewAdapter = ContactSummaryAdapter(HistoryDBWrapper(context).readableDatabase).also {
+                modeNotifyer.addObserver(it)
+            }
+            adapter = viewAdapter
         }
     }
 
@@ -75,14 +77,14 @@ class HistoryFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_summarize -> {
-                resetAdapter = detailMode
                 detailMode = false
+                recyclerView?.removeAllViews()
                 modeNotifyer.changed()
                 return true
             }
             R.id.menu_detail -> {
-                resetAdapter = !detailMode
                 detailMode = true
+                recyclerView?.removeAllViews()
                 modeNotifyer.changed()
                 return true
             }
@@ -108,19 +110,6 @@ class HistoryFragment : Fragment() {
     fun getDuration() = duration
 
     fun isDetailMode() = detailMode
-
-    private fun attachAdapter(recyclerView: RecyclerView) {
-        if (resetAdapter) {
-            modeNotifyer.deleteObservers()
-            view?.let {
-                recyclerView.adapter = if (detailMode) {
-                    ContactAdapter(HistoryDBWrapper(it.context).readableDatabase)
-                } else {
-                    ContactSummaryAdapter(HistoryDBWrapper(it.context).readableDatabase)
-                }
-            }
-        }
-    }
 
     object modeNotifyer : Observable() {
 

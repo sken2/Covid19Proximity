@@ -119,7 +119,7 @@ class ContactSummaryAdapter(val db : SQLiteDatabase) :
             }
             notifyDataSetChanged()
         }
-        if (o is FragmentManager) {
+        if (o is HistoryFragment.modeNotifyer) {
             summaryMode = !historyFragment.isDetailMode()
             history.clear()
             summaries.clear()
