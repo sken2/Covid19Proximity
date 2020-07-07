@@ -1,8 +1,6 @@
 package com.example.covidproximity.adapters
 
-import android.app.Service
 import android.content.ComponentName
-import android.content.Intent
 import android.content.ServiceConnection
 import android.database.sqlite.SQLiteDatabase
 import android.os.IBinder
@@ -42,7 +40,8 @@ class ContactAdapter(val db : SQLiteDatabase) :
                 bindService(it, connection, android.app.Service.BIND_AUTO_CREATE)
                 afterBind.add {
                     dbService?.resultDispenser?.addObserver(this@ContactAdapter)
-                    dbService?.access{ db -> ContactModel.getAll(db)}
+                    dbService?.access{ db -> ContactModel.getToday(db)}
+//                    dbService?.access{ db -> ContactModel.getAll(db)}
                 }
             }
         }
@@ -50,8 +49,8 @@ class ContactAdapter(val db : SQLiteDatabase) :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryHolder {
-        Log.v(Const.TAG, "ContactAdapter::onCreateViewHolder")
-        val frame = LayoutInflater.from(parent.context).inflate(R.layout.layout_history_record, parent, false) as ViewGroup
+//        Log.v(Const.TAG, "ContactAdapter::onCreateViewHolder")
+        val frame = LayoutInflater.from(parent.context).inflate(R.layout.litem_contact_record, parent, false) as ViewGroup
         return HistoryHolder(
             frame
         )
