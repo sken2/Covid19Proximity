@@ -7,4 +7,7 @@
     <string name="key_auto_advertise">autoAdv</string>
     <string name="key_auto_scan">autoScan</string>
     <string name="kay_start_on_boot">startOnBoot</string>
+    <string name="debug_preferences">Debug Settings</string>
+    <string name="dump_data">Write scanned Advertise to log</string>
+    <string name="key_dump_data">dumpData</string>
 </resources>
