@@ -62,6 +62,12 @@ class HistoryFragment : Fragment() {
         }
     }
 
+    override fun onPause() {
+        Log.v(Const.TAG, "HistoryFragment::onPause")
+        recyclerView?.removeAllViews()  //　TODO　save detailMode and duration to InstanceState
+        super.onPause()
+    }
+
     override fun onDestroyView() {
         Log.v(Const.TAG, "HistoryFragment::onDestroyView")
         modeNotifyer.deleteObservers()
