@@ -9,11 +9,16 @@ import android.os.Handler
 import android.os.Looper
 import android.os.ParcelUuid
 import android.util.Log
+import androidx.preference.PreferenceManager
 import com.example.covidproximity.Const
 import com.example.covidproximity.models.ContactModel
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
+import java.util.concurrent.Callable
+import java.util.concurrent.CancellationException
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
 
 object Covid19 : Observable() {
 
@@ -30,6 +35,7 @@ object Covid19 : Observable() {
     private var scanning = false
     private var advertising = false
     private var contactCount = 0
+    private val writeData = false
 
     fun getCount() : Int {
         return contactCount
@@ -104,6 +110,10 @@ object Covid19 : Observable() {
                 ScanSettings.CALLBACK_TYPE_ALL_MATCHES -> {
                     Log.v(Const.TAG, "Covid19::onScanResult callbackType = CALLBACK_TYPE_ALL_MATCHES")
                     result?.scanRecord?.run {
+                        val dump= this.bytes.joinToString(separator = " ") {
+                            String.format("%02X", it)
+                        }
+                        Log.d(Const.TAG, "Covid19::onScanResult data = $dump")
                         val proximityKey = getKey(bytes)
                         val rxRssi = result.rssi
                         //TODO look for txpower from data
@@ -240,6 +250,123 @@ object Covid19 : Observable() {
 
         fun newKey() : UUID {
             return UUID.randomUUID()
+        }
+    }
+
+    object PeriodicScanning : ScanCallback() {
+
+        var receivedPackets = 0
+        var droppedPacets = 0
+        var periodFuture : Future<Unit>? = null
+        val reduceQueue = mutableMapOf<String, ScanResult>()
+        val executor = Executors.newSingleThreadExecutor()
+
+        private val bf: ByteBuffer = ByteBuffer.allocate(16).apply {
+            this.order(ByteOrder.BIG_ENDIAN)
+        }
+
+        override fun onScanResult(callbackType: Int, result: ScanResult?) {
+            receivedPackets ++
+            result?.run {
+                val address = device.address
+                if (reduceQueue.containsKey(address)) {
+                    droppedPacets ++
+                    return
+                }
+                reduceQueue.put(address, this)
+            }
+        }
+
+        override fun onScanFailed(errorCode: Int) {
+            Log.v(Const.TAG, "Covid19::onScanFailed errorCode = $errorCode")
+            super.onScanFailed(errorCode)
+            periodFuture?.cancel(false)
+        }
+
+        fun start() {
+            scanning = true
+            nextCycle()
+            setChanged()
+            notifyObservers()
+        }
+
+        fun stop() {
+            scanning = false
+            periodFuture?.cancel(true)
+            setChanged()
+            notifyObservers()
+        }
+
+        fun nextCycle() {
+            periodFuture?.run {
+                try {
+                    get()
+                } catch (e : CancellationException) {
+                    Log.i(Const.TAG, "Covid19::nextCycle canceled")
+                }
+            }
+            if (isScanning()) {
+                periodFuture = executor.submit(PeriodicTask())
+            } else {
+                setChanged()
+                notifyObservers()
+            }
+        }
+
+        private fun getKey(data : ByteArray) : UUID {
+            var point = 0
+            while (point < data.size) {
+                when (data[point + 1]) {    // fetch type
+                    0x16.toByte() -> {
+                        bf.rewind()
+                        val keyPosition = point + 4
+                        bf.put(data.copyOfRange(keyPosition, keyPosition+16))
+                        return UUID(bf.getLong(0), bf.getLong(8))
+                    }
+                    else -> point += (data[point] + 1)
+                }
+            }
+            return UUID(-1,-1)
+        }
+
+        class PeriodicTask() : Callable<Unit> {
+
+            val handler = android.os.Handler(Looper.getMainLooper())
+
+            override fun call(): Unit {
+                reduceQueue.clear()
+                scanner?.startScan(Scanning.getFilters(), Scanning.getSettings(), PeriodicScanning)
+                Thread.sleep(1 * 1000)
+                scanner?.stopScan(PeriodicScanning)
+                Thread.sleep(100)
+                reduceQueue.forEach { (_, u) ->
+                    val dump= u.scanRecord?.bytes?.joinToString(separator = " ") {
+                        String.format("%02X", it)
+                    }
+                    Log.d(Const.TAG, "Covid19::onScanResult data = $dump")
+                    u.scanRecord?.bytes?.run {
+                        val proximityKey = getKey(this)
+                        val rxRssi = u.rssi
+                        //TODO look for txpower from data
+                        val txPower = if (Build.VERSION.SDK_INT >= 26) {
+                            u.txPower
+                        } else {
+                            -50
+                        }
+                        Log.i(Const.TAG, "Covid19::onScanResult proximity key found $proximityKey")
+                        KeyEmitter.run {
+                            arrive(
+                                ContactModel.Contact(proximityKey, txPower, rxRssi)
+                            )
+                        }
+                    }
+                }
+                Thread.sleep(13 * 1000)
+                handler.post {
+                    nextCycle()
+                }
+                return
+            }
         }
     }
 }
