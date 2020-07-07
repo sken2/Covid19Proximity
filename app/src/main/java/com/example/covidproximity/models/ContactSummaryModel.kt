@@ -32,14 +32,14 @@ object ContactSummaryModel {
         keyList.forEach { t, u ->
             var minRssiDistance = 99.0
             val count = u.size
-            val dateBegin = u.first().date
-            val dateEnd = u.last().date
+            val dateBegin = u.last().date
+            val dateEnd = u.first().date
             val minEntry = u.minBy { it.rxRssi - it.txPower }
             minEntry?.run {
                 minRssiDistance = distance(rxRssi, txPower)
             }
             val averageDistance = 99.0 // TODO
-            result.add(ContactSummary(t, dateBegin, dateEnd, count, 95.0, averageDistance))
+            result.add(ContactSummary(t, dateBegin, dateEnd, count, minRssiDistance, averageDistance))
         }
         return result
     }

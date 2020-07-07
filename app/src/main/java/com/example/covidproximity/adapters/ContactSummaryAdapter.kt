@@ -84,10 +84,11 @@ class ContactSummaryAdapter(val db : SQLiteDatabase) :
                 it.text = contactSummary.count.toString()
             }
             frame.findViewById<TextView>(R.id.text_distance_min).also {
-                it.text = contactSummary.closestDistance.toString()
+                it.text = String.format("%4.1f", contactSummary.closestDistance)
             }
             frame.findViewById<TextView>(R.id.text_distance_sd).also {
-                it.text = contactSummary.averageDistance.toString()
+                it.text = String.format("%4.1f", contactSummary.averageDistance)
+
             }
             frame.findViewById<TextView>(R.id.text_key).also {
                 it.text = contactSummary.key.toString()
