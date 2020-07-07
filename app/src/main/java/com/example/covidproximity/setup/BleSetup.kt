@@ -22,7 +22,7 @@ import java.util.*
  */
 object BleSetup : Observable() {
 
-    val adapter: BluetoothAdapter? by lazy {
+    private val adapter: BluetoothAdapter? by lazy {
         BluetoothAdapter.getDefaultAdapter()
     }
     val preferPlivileges = arrayOf(
