@@ -68,6 +68,30 @@ object ContactModel {
         }
     }
 
+    fun getOneWeek(db :SQLiteDatabase) : List<Contact> {
+        if (Build.VERSION.SDK_INT >=26) {
+            val now = LocalDate.now()
+            var start = now.atStartOfDay()
+            val end = start.plusDays(1)
+            start = start.minusDays(6)
+            return getWhile(db, start.toInstant(ZoneOffset.UTC).toString() ,end.toInstant(ZoneOffset.UTC).toString())
+        } else {
+            return emptyList()  //　TODO off course
+        }
+    }
+
+    fun getTwoWeeks(db :SQLiteDatabase) : List<Contact> {
+        if (Build.VERSION.SDK_INT >=26) {
+            val now = LocalDate.now()
+            var start = now.atStartOfDay()
+            val end = start.plusDays(1)
+            start = start.minusDays(13)
+            return getWhile(db, start.toInstant(ZoneOffset.UTC).toString() ,end.toInstant(ZoneOffset.UTC).toString())
+        } else {
+            return emptyList()  //　TODO off course
+        }
+    }
+
     fun getWhile(db: SQLiteDatabase, since : String, till : String) : List<Contact> {
         val result = mutableListOf<Contact>()
         val projection = arrayOf(

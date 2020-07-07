@@ -1,10 +1,7 @@
 package com.example.covidproximity.models
 
 import android.database.sqlite.SQLiteDatabase
-import android.os.Build
-import com.example.covidproximity.Const
-import java.lang.Math.sqrt
-import java.time.LocalDate
+import java.lang.Math.log
 import java.util.*
 
 
@@ -16,25 +13,39 @@ object ContactSummaryModel {
 
     fun getTodaysSummary(db: SQLiteDatabase) : List<ContactSummary> {
         val todaysHitory = ContactModel.getToday(db)
-        return distinctMap(todaysHitory)
+        return distinctList(todaysHitory)
     }
 
-    fun distinctMap(history : List<ContactModel.Contact>) :List<ContactSummary> {
+    fun getOneWeekSummary(db : SQLiteDatabase) : List<ContactSummary> {
+        val todaysHitory = ContactModel.getOneWeek(db)
+        return distinctList(todaysHitory)
+    }
+
+    fun getTwoWeekSummary(db : SQLiteDatabase) : List<ContactSummary> {
+        val todaysHitory = ContactModel.getTwoWeeks(db)
+        return distinctList(todaysHitory)
+    }
+
+    fun distinctList(history : List<ContactModel.Contact>) :List<ContactSummary> {
         val result = mutableListOf<ContactSummary>()
         val keyList = history.groupBy { it.uuid }
-        var minRssiDistance = 99.0
         keyList.forEach { t, u ->
+            var minRssiDistance = 99.0
             val count = u.size
             val dateBegin = u.first().date
             val dateEnd = u.last().date
-//            minRssiDistance = u.minBy { it.rxRssi - it.txPower }.let {
-//                val boo = (it.rxRssi - it.txPower).toDouble()
-//                sqrt(boo * boo)
-//            }
+            val minEntry = u.minBy { it.rxRssi - it.txPower }
+            minEntry?.run {
+                minRssiDistance = distance(rxRssi, txPower)
+            }
             val averageDistance = 99.0 // TODO
             result.add(ContactSummary(t, dateBegin, dateEnd, count, 95.0, averageDistance))
         }
         return result
+    }
+
+    private fun distance(rx : Int, tx : Int) : Double {
+        return log( (rx - tx) * (rx - tx).toDouble())
     }
 
     data class ContactSummary(
