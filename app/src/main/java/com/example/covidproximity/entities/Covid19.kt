@@ -17,13 +17,13 @@ import java.util.*
 
 object Covid19 : Observable() {
 
-    val adapter by lazy {
+    private val adapter by lazy {
         BluetoothAdapter.getDefaultAdapter()
     }
-    val scanner by lazy {
+    private val scanner by lazy {
         adapter?.bluetoothLeScanner
     }
-    val advertiszer by lazy {
+    private val advertiszer by lazy {
         adapter?.bluetoothLeAdvertiser
     }
     private val uuid = UUID.fromString(Const.UUID)
@@ -164,7 +164,6 @@ object Covid19 : Observable() {
 
     object Advertisement : AdvertiseCallback() {
 
-//        private var proximityKey : UUID? = null
         private val bf = ByteBuffer.allocate(20).order(ByteOrder.BIG_ENDIAN)
 
         override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
