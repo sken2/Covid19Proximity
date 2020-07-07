@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="150dp">
+    android:layout_height="90dp">
 
     <TextView
         android:id="@+id/text_datetime_begin"
-        android:layout_width="wrap_content"
+        android:layout_width="99dp"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="25dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="15dp"
+        android:singleLine="true"
         android:text="TextView" />
 
     <TextView
@@ -18,9 +19,10 @@
         android:layout_width="188dp"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="9dp"
-        android:layout_marginTop="91dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="12dp"
+        android:layout_marginBottom="14dp"
+        android:singleLine="true"
         android:text="TextView" />
 
     <TextView
@@ -29,17 +31,17 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="19dp"
-        android:layout_marginEnd="35dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="29dp"
         android:text="TextView" />
 
     <TextView
         android:id="@+id/text_distance_min"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="94dp"
-        android:layout_marginEnd="23dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="21dp"
+        android:layout_marginBottom="14dp"
         android:layout_toStartOf="@+id/text_distance_sd"
         android:text="TextView" />
 
@@ -47,20 +49,21 @@
         android:id="@+id/text_distance_sd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="93dp"
-        android:layout_marginEnd="29dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="22dp"
+        android:layout_marginBottom="15dp"
         android:text="TextView" />
 
     <TextView
         android:id="@+id/text_datetime_end"
-        android:layout_width="wrap_content"
+        android:layout_width="113dp"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="53dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="15dp"
         android:layout_toEndOf="@+id/text_datetime_begin"
+        android:singleLine="true"
         android:text="TextView" />
 
 </RelativeLayout>
