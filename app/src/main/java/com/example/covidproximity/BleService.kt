@@ -26,12 +26,7 @@ class BleService : Service(), Observer {
     lateinit var contactDb : SQLiteDatabase
     private val preferences : SharedPreferences by lazy {
         PreferenceManager.getDefaultSharedPreferences(this)
-//        this.applicationContext.getSharedPreferences(Const.PREFERENCE_NAME,Context.MODE_PRIVATE)
     }
-    private val nm by lazy {
-        getSystemService(Context.NOTIFICATION_SERVICE)
-    }
-
     override fun onCreate() {
         Log.v(Const.TAG, "BleService::onCreate")
         super.onCreate()
@@ -111,6 +106,22 @@ class BleService : Service(), Observer {
                 Log.e(Const.TAG, "BleService::update unknown update from $o")
             }
         }
+    }
+
+    fun startAdvertisze() {
+        Covid19.KeyDispenser.start(this)
+    }
+
+    fun stopAdvertise() {
+        Covid19.KeyDispenser.stop()
+    }
+
+    fun startScanning() {
+        Covid19.PeriodicScanning.start()
+    }
+
+    fun stopScanning() {
+        Covid19.PeriodicScanning.stop()
     }
 
     fun shutdown() {

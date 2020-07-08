@@ -362,6 +362,7 @@ object Covid19 : Observable() {
                     }
                 }
                 Thread.sleep(13 * 1000)
+                if (Thread.interrupted()) return
                 handler.post {
                     nextCycle()
                 }

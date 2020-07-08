@@ -23,6 +23,9 @@ class ControlFragment : Fragment(), Observer {
     val scanSwitch by lazy {
         view?.findViewById<Switch>(R.id.switch_scan)
     }
+    val mainActivity by lazy {
+        requireActivity() as MainActivity
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,16 +43,9 @@ class ControlFragment : Fragment(), Observer {
                 this.isChecked = Covid19.isAdvertising()
                 this.setOnCheckedChangeListener { buttonView, isChecked ->
                     if (isChecked) {
-                        this.context?.run {
-                            if (context is MainActivity) {
-                                val mainActivity = context as MainActivity
-                                mainActivity.bleService?.let {
-                                    Covid19.KeyDispenser.start(it)
-                                }
-                            }
-                        }
+                        mainActivity.bleService?.startAdvertisze()
                     } else {
-                        Covid19.KeyDispenser.stop()
+                        mainActivity.bleService?.stopAdvertise()
                     }
                 }
             }
@@ -57,9 +53,9 @@ class ControlFragment : Fragment(), Observer {
                 this.isChecked = Covid19.isScanning()
                 this.setOnCheckedChangeListener { buttonView, isChecked ->
                     if (isChecked) {
-                        Covid19.startScanning()
+                        mainActivity.bleService?.startScanning()
                     } else {
-                        Covid19.stopScanning()
+                        mainActivity.bleService?.stopScanning()
                     }
                 }
             }
