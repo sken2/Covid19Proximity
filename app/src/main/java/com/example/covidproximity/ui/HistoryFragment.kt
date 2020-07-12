@@ -1,6 +1,8 @@
 package com.example.covidproximity.ui
 
 import android.os.Bundle
+import android.os.Parcel
+import android.os.Parcelable
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -32,6 +34,7 @@ class HistoryFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        restoreState(savedInstanceState)
     }
 
     override fun onCreateView(
@@ -45,6 +48,7 @@ class HistoryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Log.v(Const.TAG, "HistoryFragment::onViewCreated")
         super.onViewCreated(view, savedInstanceState)
+        restoreState(savedInstanceState)
 
         view.findViewById<Button>(R.id.button_second).setOnClickListener {
             findNavController().navigate(R.id.action_historyFragment_to_controlFragment)
@@ -64,7 +68,8 @@ class HistoryFragment : Fragment() {
 
     override fun onPause() {
         Log.v(Const.TAG, "HistoryFragment::onPause")
-        recyclerView?.removeAllViews()  //　TODO　save detailMode and duration to InstanceState
+        saveState()
+//        recyclerView?.removeAllViews()  //　TODO　save detailMode and duration to InstanceState
         super.onPause()
     }
 
@@ -84,13 +89,13 @@ class HistoryFragment : Fragment() {
         when (item.itemId) {
             R.id.menu_summarize -> {
                 detailMode = false
-                recyclerView?.removeAllViews()
+                manager.removeAllViews()
                 modeNotifyer.changed()
                 return true
             }
             R.id.menu_detail -> {
                 detailMode = true
-                recyclerView?.removeAllViews()
+                manager.removeAllViews()
                 modeNotifyer.changed()
                 return true
             }
@@ -117,6 +122,21 @@ class HistoryFragment : Fragment() {
 
     fun isDetailMode() = detailMode
 
+    fun restoreState(savedInstanceState: Bundle?) {
+        savedInstanceState?.run {
+            detailMode = getBoolean(Const.Keys.DetailMode)
+            getString(Const.Keys.Duration)?.let {
+                duration = InstrumentDuration.valueOf(it)
+            }
+        }
+    }
+
+    fun saveState() {
+        val bundle = Bundle()
+        bundle.putBoolean(Const.Keys.DetailMode, detailMode)
+        bundle.putString(Const.Keys.Duration, duration.name)
+    }
+
     object modeNotifyer : Observable() {
 
         fun changed() {
@@ -125,10 +145,10 @@ class HistoryFragment : Fragment() {
         }
     }
 
-    enum class InstrumentDuration {
-        TODAY,
-        ONE_WEEK,
-        TWO_WEEKS,
-        WHOLE_DATA
+    enum class InstrumentDuration() {
+        TODAY(),
+        ONE_WEEK(),
+        TWO_WEEKS(),
+        WHOLE_DATA()
     }
 }

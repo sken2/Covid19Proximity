@@ -25,11 +25,11 @@ class ContactSummaryAdapter(val db : SQLiteDatabase) :
     Observer {
 
     private var dbService : ContactDBService? = null
-    val summaries = mutableListOf<ContactSummaryModel.ContactSummary>()
-    val history = mutableListOf<ContactModel.Contact>()
-    var summaryMode = false
+    private val summaries = mutableListOf<ContactSummaryModel.ContactSummary>()
+    private val history = mutableListOf<ContactModel.Contact>()
+    private var summaryMode = false
     private lateinit var recycler : RecyclerView
-    val historyFragment by lazy {
+    private val historyFragment by lazy {
         FragmentManager.findFragment<HistoryFragment>(recycler)
     }
     private val afterBind = LinkedList<() -> Unit>()
