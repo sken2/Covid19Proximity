@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
         when (BleSetup.getState()) {
             BleSetup.Status.NEED_PRIVILAGE -> {
                 var previleageNeeded = emptyArray<String>()
-                for (previleage in BleSetup.preferPlivileges) {
+                for (previleage in BleSetup.preferPrivileges) {
                     if (ContextCompat.checkSelfPermission(this, previleage) != PackageManager.PERMISSION_GRANTED) {
                         previleageNeeded += previleage
                     }

@@ -25,7 +25,7 @@ object BleSetup : Observable() {
     private val adapter: BluetoothAdapter? by lazy {
         BluetoothAdapter.getDefaultAdapter()
     }
-    val preferPlivileges = arrayOf(
+    val preferPrivileges = arrayOf(
         if (Build.VERSION.SDK_INT >=28) {
             Manifest.permission.ACCESS_FINE_LOCATION
         } else {
@@ -34,7 +34,7 @@ object BleSetup : Observable() {
     )
     private var btEnable = isAdapterEnabled()
     private var locationElable = false
-    private var prefileageFullfill = false
+    private var preferPrivileageFullfill = false
     private var availability = Status.UNKNOWN
 
     enum class Status(val state :String) {
@@ -55,7 +55,7 @@ object BleSetup : Observable() {
     }
 
     fun isPrivilageFullfill() :Boolean {
-        return prefileageFullfill
+        return preferPrivileageFullfill
     }
 
     fun isLocationEnable() : Boolean {
@@ -72,13 +72,13 @@ object BleSetup : Observable() {
 
     fun onPrevileageChanged(context : Context) {
         var newPrevileageState = true
-        for (previleage in preferPlivileges) {
+        for (previleage in preferPrivileges) {
             if (ContextCompat.checkSelfPermission(context, previleage) != PackageManager.PERMISSION_GRANTED) {
                 newPrevileageState = false
             }
         }
-        if (prefileageFullfill != newPrevileageState) {
-            prefileageFullfill = newPrevileageState
+        if (preferPrivileageFullfill != newPrevileageState) {
+            preferPrivileageFullfill = newPrevileageState
             setChanged()
             notifyObservers(availability)
         }
@@ -105,7 +105,7 @@ object BleSetup : Observable() {
         return when {
             adapter == null -> Status.NO_ADAPTER
             !btEnable -> Status.ADAPTER_IS_OFF
-            !prefileageFullfill -> Status.NEED_PRIVILAGE
+            !preferPrivileageFullfill -> Status.NEED_PRIVILAGE
             !locationElable -> Status.LOCATION_IS_OFF
             else -> Status.OK
         }
