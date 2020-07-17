@@ -1,8 +1,6 @@
 package com.example.covidproximity.ui
 
-import android.os.Bundle
-import android.os.Parcel
-import android.os.Parcelable
+import android.os.*
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -29,6 +27,9 @@ class HistoryFragment : Fragment() {
     private var actionMode : androidx.appcompat.view.ActionMode? = null
     private val recyclerView by lazy {
         view?.findViewById<RecyclerView>(R.id.recycler_history)
+    }
+    private val handler by lazy {
+        Handler(Looper.getMainLooper())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,10 +67,14 @@ class HistoryFragment : Fragment() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        Log.v(Const.TAG, "HistoryFragment::onSaveInstanceState")
+        saveState(outState)
+        super.onSaveInstanceState(outState)
+    }
+
     override fun onPause() {
         Log.v(Const.TAG, "HistoryFragment::onPause")
-        saveState()
-//        recyclerView?.removeAllViews()  //　TODO　save detailMode and duration to InstanceState
         super.onPause()
     }
 
@@ -131,17 +136,20 @@ class HistoryFragment : Fragment() {
         }
     }
 
-    fun saveState() {
-        val bundle = Bundle()
+    fun saveState(bundle : Bundle) {
         bundle.putBoolean(Const.Keys.DetailMode, detailMode)
         bundle.putString(Const.Keys.Duration, duration.name)
     }
 
     object modeNotifyer : Observable() {
 
+        val handler = Handler(Looper.getMainLooper())
+
         fun changed() {
             setChanged()
-            notifyObservers()
+            handler.post {
+                notifyObservers()
+            }
         }
     }
 
