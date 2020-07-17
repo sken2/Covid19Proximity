@@ -12,7 +12,7 @@ import com.example.covidproximity.Const
 import com.example.covidproximity.MainActivity
 import com.example.covidproximity.adapters.ContactAdapter
 import com.example.covidproximity.R
-import com.example.covidproximity.adapters.ContactSummaryAdapter
+import com.example.covidproximity.adapters.HybridContactAdapter
 import com.example.covidproximity.adapters.HistoryDBWrapper
 import java.util.*
 
@@ -60,7 +60,7 @@ class HistoryFragment : Fragment() {
         recyclerView?.apply {
             setHasFixedSize(true)
             layoutManager = manager
-            val viewAdapter = ContactSummaryAdapter(HistoryDBWrapper(context).readableDatabase).also {
+            val viewAdapter = HybridContactAdapter(HistoryDBWrapper(context).readableDatabase).also {
                 modeNotifyer.addObserver(it)
             }
             adapter = viewAdapter

@@ -20,8 +20,8 @@ import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ContactSummaryAdapter(val db : SQLiteDatabase) :
-    RecyclerView.Adapter<ContactSummaryAdapter.EntryHolder>(),
+class HybridContactAdapter(val db : SQLiteDatabase) :
+    RecyclerView.Adapter<HybridContactAdapter.EntryHolder>(),
     Observer {
 
     private var dbService : ContactDBService? = null
@@ -44,7 +44,7 @@ class ContactSummaryAdapter(val db : SQLiteDatabase) :
             ).also {
                 bindService(it, connection, android.app.Service.BIND_AUTO_CREATE)
                 afterBind.add {
-                    dbService?.resultDispenser?.addObserver(this@ContactSummaryAdapter)
+                    dbService?.resultDispenser?.addObserver(this@HybridContactAdapter)
                     refresh()
                 }
             }
