@@ -16,7 +16,7 @@
         android:theme="@style/AppTheme">
 
         <service
-            android:name=".BleService"
+            android:name=".tasks.BleService"
             android:enabled="true"
             android:exported="false">
             <intent-filter>

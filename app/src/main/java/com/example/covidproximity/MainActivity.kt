@@ -24,6 +24,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import com.example.covidproximity.setup.BleSetup
 import com.example.covidproximity.setup.NotificationSetup
+import com.example.covidproximity.tasks.BleService
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {

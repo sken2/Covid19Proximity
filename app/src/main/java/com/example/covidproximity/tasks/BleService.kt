@@ -1,4 +1,4 @@
-package com.example.covidproximity
+package com.example.covidproximity.tasks
 
 import android.app.*
 import android.bluetooth.BluetoothAdapter
@@ -12,6 +12,8 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
+import com.example.covidproximity.Const
+import com.example.covidproximity.R
 import com.example.covidproximity.adapters.HistoryDBWrapper
 import com.example.covidproximity.entities.Covid19
 import com.example.covidproximity.models.ContactModel

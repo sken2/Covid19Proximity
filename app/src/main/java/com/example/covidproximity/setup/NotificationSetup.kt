@@ -14,7 +14,7 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.StyleSpan
 import android.util.Log
-import com.example.covidproximity.BleService
+import com.example.covidproximity.tasks.BleService
 import com.example.covidproximity.Const
 import com.example.covidproximity.MainActivity
 import com.example.covidproximity.R
