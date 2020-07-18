@@ -76,9 +76,20 @@ class HybridContactAdapter(val db : SQLiteDatabase) :
         }
     }
 
+    override fun getItemId(position: Int): Long {
+        return if (detailMode) 1L else 2L
+    }
+
     override fun onBindViewHolder(holder: EntryHolder, position: Int) {
         val frame = holder.itemView as ViewGroup
         if (detailMode) {
+            frame.findViewById<TextView>(R.id.view_history_time).also {
+                it.text = history.get(position).date.toString()
+            }
+            frame.findViewById<TextView>(R.id.view_history_key).also {
+                it.text = history.get(position).uuid.toString()
+            }
+        } else {
             val contactSummary = summaries.get(position)
             frame.findViewById<TextView>(R.id.text_datetime_begin).also {
                 it.text = mdhmsFormatter.format(contactSummary.since)
@@ -94,17 +105,9 @@ class HybridContactAdapter(val db : SQLiteDatabase) :
             }
             frame.findViewById<TextView>(R.id.text_distance_sd).also {
                 it.text = String.format("%4.1f", contactSummary.averageDistance)
-
             }
             frame.findViewById<TextView>(R.id.text_key).also {
                 it.text = contactSummary.key.toString()
-            }
-        } else {
-            frame.findViewById<TextView>(R.id.view_history_time).also {
-                it.text = history.get(position).date.toString()
-            }
-            frame.findViewById<TextView>(R.id.view_history_key).also {
-                it.text = history.get(position).uuid.toString()
             }
         }
     }
@@ -131,9 +134,16 @@ class HybridContactAdapter(val db : SQLiteDatabase) :
                 detailMode = historyFragment.isDetailMode()
                 history.clear()
                 summaries.clear()
+                notifyDataSetChanged()
                 refresh()
             }
         }
+    }
+
+    fun forget() {
+        history.clear()
+        summaries.clear()
+        notifyDataSetChanged()
     }
 
     private fun refresh() {
@@ -154,6 +164,7 @@ class HybridContactAdapter(val db : SQLiteDatabase) :
     class EntryHolder(itemView: ViewGroup) : RecyclerView.ViewHolder(itemView)
 
     private val connection = object : ServiceConnection {
+
         override fun onServiceDisconnected(name: ComponentName?) {
             Log.v(Const.TAG, "ContactSummaryAdapter::onServiceDisconnected")
             dbService = null

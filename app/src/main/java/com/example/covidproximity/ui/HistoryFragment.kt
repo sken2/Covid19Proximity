@@ -90,15 +90,21 @@ class HistoryFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        var adapter : HybridContactAdapter? = null
+        if (recyclerView?.adapter is HybridContactAdapter) {
+            adapter = recyclerView?.adapter as HybridContactAdapter
+        }
         when (item.itemId) {
             R.id.menu_summarize -> {
                 detailMode = false
+                adapter?.forget()
                 manager.removeAllViews()
                 modeNotifyer.changed()
                 return true
             }
             R.id.menu_detail -> {
                 detailMode = true
+                adapter?.forget()
                 manager.removeAllViews()
                 modeNotifyer.changed()
                 return true
