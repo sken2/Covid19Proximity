@@ -13,6 +13,10 @@ import java.util.*
 
 object ContactModel {
 
+    const val EXPIRE_DAYS = 14L
+    const val PAST_A_WEEK = 6L
+    const val PAST_TWO_WEEKS = 13L
+
     object ContactTable : BaseColumns {
         const val TABLE_NAME = "history"
         const val COLUMN_NAME_TIME = "time"
@@ -73,10 +77,12 @@ object ContactModel {
             val now = LocalDate.now()
             var start = now.atStartOfDay()
             val end = start.plusDays(1)
-            start = start.minusDays(6)
+            start = start.minusDays(PAST_A_WEEK)
             return getWhile(db, start.toInstant(ZoneOffset.UTC).toString() ,end.toInstant(ZoneOffset.UTC).toString())
         } else {
-            return emptyList()  //　TODO off course
+            val today = Date().apply {hours = 0; minutes = 0; seconds = 0}
+            val past = Date().apply { date -= PAST_A_WEEK.toInt(); hours = 0; minutes = 0; seconds = 0 }
+            return getWhile(db, Const.ISO8601.format(today), Const.ISO8601.format(past))
         }
     }
 
@@ -85,10 +91,12 @@ object ContactModel {
             val now = LocalDate.now()
             var start = now.atStartOfDay()
             val end = start.plusDays(1)
-            start = start.minusDays(13)
+            start = start.minusDays(PAST_TWO_WEEKS)
             return getWhile(db, start.toInstant(ZoneOffset.UTC).toString() ,end.toInstant(ZoneOffset.UTC).toString())
         } else {
-            return emptyList()  //　TODO off course
+            val today = Date().apply {hours = 0; minutes = 0; seconds = 0}
+            val past = Date().apply { date -= PAST_TWO_WEEKS.toInt(); hours = 0; minutes = 0; seconds = 0 }
+            return getWhile(db, Const.ISO8601.format(today), Const.ISO8601.format(past))
         }
     }
 
@@ -100,9 +108,7 @@ object ContactModel {
             ContactTable.COLUMN_NAME_TX_POWER,
             ContactTable.COLUMN_NAME_RX_RSSI
         )
-        val selection =
-            "${ContactTable.COLUMN_NAME_TIME} BETWEEN  '$since' and '$till'"
-//        val selectionArgs = arrayOf("between",  Const.ISO8601.format(since), "and", Const.ISO8601.format(till) )
+        val selection = "${ContactTable.COLUMN_NAME_TIME} BETWEEN  '$since' and '$till'"
         val sortOrder = "${ContactTable.COLUMN_NAME_TIME} desc"
         val cursor = db.query(ContactTable.TABLE_NAME, projection, selection, null,null, null, sortOrder)
         while (cursor.moveToNext()) {
@@ -146,6 +152,23 @@ object ContactModel {
         }
         val id = db.insert(ContactTable.TABLE_NAME, null, values)
         Log.v("TAG", "ContactModel::record inserted $id")
+    }
+
+    fun expire(db : SQLiteDatabase) {
+        val outDate =
+            if (Build.VERSION.SDK_INT >=26) {
+                LocalDate.now().atStartOfDay().minusDays(EXPIRE_DAYS).toInstant(ZoneOffset.UTC).toString()
+            } else {
+                val expireDate = Date().apply {
+                    date -= 14
+                    hours = 0
+                    minutes = 0
+                    seconds = 0
+                }
+                Const.ISO8601.format(expireDate)
+            }
+        val sql = "DELETE from ${ContactTable.TABLE_NAME} WHERE ${ContactTable.COLUMN_NAME_TIME} < $outDate"
+        db.execSQL(sql)
     }
 
     class Contact() {
