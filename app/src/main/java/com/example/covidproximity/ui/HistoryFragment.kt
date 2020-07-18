@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.covidproximity.Const
 import com.example.covidproximity.MainActivity
-import com.example.covidproximity.adapters.ContactAdapter
 import com.example.covidproximity.R
 import com.example.covidproximity.adapters.HybridContactAdapter
 import com.example.covidproximity.adapters.HistoryDBWrapper
@@ -143,13 +142,9 @@ class HistoryFragment : Fragment() {
 
     object modeNotifyer : Observable() {
 
-        val handler = Handler(Looper.getMainLooper())
-
         fun changed() {
             setChanged()
-            handler.post {
-                notifyObservers()
-            }
+            notifyObservers()
         }
     }
 
