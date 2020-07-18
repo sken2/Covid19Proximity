@@ -1,9 +1,12 @@
 package com.example.covidproximity.adapters
 
 import android.content.ComponentName
+import android.content.Intent
 import android.content.ServiceConnection
 import android.database.sqlite.SQLiteDatabase
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -27,20 +30,23 @@ class HybridContactAdapter(val db : SQLiteDatabase) :
     private var dbService : ContactDBService? = null
     private val summaries = mutableListOf<ContactSummaryModel.ContactSummary>()
     private val history = mutableListOf<ContactModel.Contact>()
-    private var summaryMode = false
+    private var detailMode = false
     private lateinit var recycler : RecyclerView
     private val historyFragment by lazy {
         FragmentManager.findFragment<HistoryFragment>(recycler)
     }
     private val afterBind = LinkedList<() -> Unit>()
+    private val handler by lazy {
+        Handler(Looper.getMainLooper())
+    }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         Log.v(Const.TAG, "ContactSummaryAdapter::onAttachedRecyclerView")
         recycler = recyclerView
         with(recyclerView.context.applicationContext) {
-            android.content.Intent(
+            Intent(
                 this,
-                com.example.covidproximity.tasks.ContactDBService::class.java
+                ContactDBService::class.java
             ).also {
                 bindService(it, connection, android.app.Service.BIND_AUTO_CREATE)
                 afterBind.add {
@@ -54,25 +60,25 @@ class HybridContactAdapter(val db : SQLiteDatabase) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) :EntryHolder  {
 //        Log.v(Const.TAG, "ContactSummaryAdapter::onCreateViewHolder")
-        val frame = if (summaryMode) {
-            LayoutInflater.from(parent.context).inflate(R.layout.item_contact_summary, parent, false) as ViewGroup
-        } else {
+        val frame = if (detailMode) {
             LayoutInflater.from(parent.context).inflate(R.layout.litem_contact_record, parent, false) as ViewGroup
+        } else {
+            LayoutInflater.from(parent.context).inflate(R.layout.item_contact_summary, parent, false) as ViewGroup
         }
         return EntryHolder(frame)
     }
 
     override fun getItemCount(): Int {
-        return if (summaryMode) {
-            summaries.size
-        } else {
+        return if (detailMode) {
             history.size
+        } else {
+            summaries.size
         }
     }
 
     override fun onBindViewHolder(holder: EntryHolder, position: Int) {
         val frame = holder.itemView as ViewGroup
-        if (summaryMode) {
+        if (detailMode) {
             val contactSummary = summaries.get(position)
             frame.findViewById<TextView>(R.id.text_datetime_begin).also {
                 it.text = mdhmsFormatter.format(contactSummary.since)
@@ -113,18 +119,20 @@ class HybridContactAdapter(val db : SQLiteDatabase) :
     override fun update(o: Observable?, arg: Any?) {
         if (o is ContactDBService.ResultDispenser) {
             val result = arg as List<ContactModel.Contact>
-            if (summaryMode) {
-                summaries.addAll(ContactSummaryModel.distinctList(result))
-            } else {
+            if (detailMode) {
                 history.addAll(result)
+            } else {
+                summaries.addAll(ContactSummaryModel.distinctList(result))
             }
             notifyDataSetChanged()
         }
         if (o is HistoryFragment.modeNotifyer) {
-            summaryMode = !historyFragment.isDetailMode()
-            history.clear()
-            summaries.clear()
-            refresh()
+            handler.post {
+                detailMode = historyFragment.isDetailMode()
+                history.clear()
+                summaries.clear()
+                refresh()
+            }
         }
     }
 
